@@ -31,12 +31,12 @@
 <body class="min-h-full flex flex-col bg-shinobi-dark text-slate-200 font-sans antialiased selection:bg-shinobi-red selection:text-white">
 
     <!-- Top Navigation Bar (Fidèle à la maquette Otaku Arena) -->
-    <!-- Affichée uniquement sur desktop, ou sur mobile une fois connecté après inscription -->
-    <header class="{{ auth()->check() ? 'block' : 'hidden md:block' }} sticky top-0 z-50 bg-shinobi-dark/95 backdrop-blur border-b border-shinobi-border">
+    <!-- Visible sur tous les écrans (desktop & mobile) -->
+    <header class="sticky top-0 z-50 bg-shinobi-dark/95 backdrop-blur border-b border-shinobi-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 
-                <!-- Logo Otaku Arena -->
+                <!-- Logo Otaku Arena (Toujours visible avec son texte) -->
                 <div class="flex items-center gap-3">
                     <a href="{{ auth()->check() ? route('fighters.my-character') : route('dashboard') }}" class="flex items-center gap-2.5 group">
                         <div class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-shinobi-red/60 shadow-lg shadow-shinobi-red/25 group-hover:scale-105 transition-transform bg-shinobi-card flex items-center justify-center shrink-0">
@@ -168,7 +168,7 @@
                             </div>
                         </div>
                     @else
-                        <!-- Maquette Panneau 1 : Bouton "Se connecter" et "S'inscrire" (affichés uniquement en desktop md+) -->
+                        <!-- Maquette Panneau 1 : Boutons "Se connecter" et "S'inscrire" (affichés uniquement en desktop md+, masqués sur mobile) -->
                         <div class="hidden md:flex items-center gap-2">
                             <a href="{{ route('login') }}" class="font-mono text-xs text-slate-300 hover:text-white uppercase tracking-wider px-3 py-2 transition">
                                 Se connecter
@@ -233,108 +233,72 @@
 
     <!-- ========================================================================= -->
     <!-- DOCK FLOTTANT MOBILE GAMING (Inspi Floating Pill Dock Dark Shōnen)       -->
+    <!-- Visible UNIQUEMENT une fois connecté (après inscription/connexion)       -->
     <!-- ========================================================================= -->
+    @auth
     <div class="md:hidden fixed bottom-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
         <nav class="pointer-events-auto w-full max-w-sm rounded-full bg-[#141217]/90 backdrop-blur-xl border border-shinobi-border/80 px-2 py-1.5 shadow-[0_10px_35px_rgba(0,0,0,0.8)] ring-1 ring-white/10">
             <div class="flex items-center justify-between">
                 
-                @guest
-                    <!-- 1. Accueil -->
-                    @php $isDash = request()->routeIs('dashboard'); @endphp
-                    <a href="{{ route('dashboard') }}" 
-                       class="relative flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-300 {{ $isDash ? 'text-white bg-shinobi-red shadow-lg shadow-shinobi-red/40' : 'text-slate-400 hover:text-white' }}">
-                        <i class="bi bi-house text-base leading-none"></i>
-                        <span class="font-mono text-[9px] font-bold mt-0.5">Accueil</span>
-                        @if($isDash)
-                            <span class="absolute -bottom-1 w-1 h-1 rounded-full bg-white"></span>
-                        @endif
-                    </a>
+                <!-- 1. Mon Ninja -->
+                @php $isNinja = request()->routeIs('fighters.*'); @endphp
+                <a href="{{ route('fighters.my-character') }}" 
+                   class="relative flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-300 {{ $isNinja ? 'text-white bg-shinobi-red shadow-lg shadow-shinobi-red/40' : 'text-slate-400 hover:text-white' }}">
+                    <i class="bi bi-person-badge text-base leading-none"></i>
+                    <span class="font-mono text-[9px] font-bold mt-0.5">Ninja</span>
+                    @if($isNinja)
+                        <span class="absolute -bottom-1 w-1 h-1 rounded-full bg-white"></span>
+                    @endif
+                </a>
 
-                    <!-- 2. Tournois -->
-                    @php $isTourn = request()->routeIs('tournaments.*'); @endphp
-                    <a href="{{ route('tournaments.open-list') }}" 
-                       class="relative flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-300 {{ $isTourn ? 'text-shinobi-dark bg-shinobi-gold shadow-lg shadow-shinobi-gold/40' : 'text-slate-400 hover:text-white' }}">
-                        <i class="bi bi-trophy text-base leading-none"></i>
-                        <span class="font-mono text-[9px] font-bold mt-0.5">Tournois</span>
-                        @if($isTourn)
-                            <span class="absolute -bottom-1 w-1 h-1 rounded-full bg-shinobi-dark"></span>
-                        @endif
-                    </a>
+                <!-- 2. Tournois -->
+                @php $isTourn = request()->routeIs('tournaments.*'); @endphp
+                <a href="{{ route('tournaments.open-list') }}" 
+                   class="relative flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-300 {{ $isTourn ? 'text-shinobi-dark bg-shinobi-gold shadow-lg shadow-shinobi-gold/40' : 'text-slate-400 hover:text-white' }}">
+                    <i class="bi bi-trophy text-base leading-none"></i>
+                    <span class="font-mono text-[9px] font-bold mt-0.5">Tournois</span>
+                    @if($isTourn)
+                        <span class="absolute -bottom-1 w-1 h-1 rounded-full bg-shinobi-dark"></span>
+                    @endif
+                </a>
 
-                    <!-- 3. Classement -->
-                    @php $isLead = request()->routeIs('leaderboard.*'); @endphp
-                    <a href="{{ route('leaderboard.index') }}" 
-                       class="relative flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-300 {{ $isLead ? 'text-white bg-shinobi-red shadow-lg shadow-shinobi-red/40' : 'text-slate-400 hover:text-white' }}">
-                        <i class="bi bi-bar-chart-line text-base leading-none"></i>
-                        <span class="font-mono text-[9px] font-bold mt-0.5">Rang</span>
-                    </a>
+                <!-- 3. Stratégies -->
+                @php $isStrat = request()->routeIs('strategies.*'); @endphp
+                <a href="{{ route('strategies.index') }}" 
+                   class="relative flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-300 {{ $isStrat ? 'text-white bg-white/20 shadow-lg border border-white/30' : 'text-slate-400 hover:text-white' }}">
+                    <i class="bi bi-sliders text-base leading-none"></i>
+                    <span class="font-mono text-[9px] font-bold mt-0.5">Tactique</span>
+                    @if($isStrat)
+                        <span class="absolute -bottom-1 w-1 h-1 rounded-full bg-shinobi-gold"></span>
+                    @endif
+                </a>
 
-                    <!-- 4. Connexion -->
-                    <a href="{{ route('login') }}" 
-                       class="flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition text-slate-400 hover:text-white">
-                        <i class="bi bi-box-arrow-in-right text-base leading-none"></i>
-                        <span class="font-mono text-[9px] font-medium mt-0.5">Connexion</span>
-                    </a>
-                @else
-                    <!-- 1. Mon Ninja -->
-                    @php $isNinja = request()->routeIs('fighters.*'); @endphp
-                    <a href="{{ route('fighters.my-character') }}" 
-                       class="relative flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-300 {{ $isNinja ? 'text-white bg-shinobi-red shadow-lg shadow-shinobi-red/40' : 'text-slate-400 hover:text-white' }}">
-                        <i class="bi bi-person-badge text-base leading-none"></i>
-                        <span class="font-mono text-[9px] font-bold mt-0.5">Ninja</span>
-                        @if($isNinja)
-                            <span class="absolute -bottom-1 w-1 h-1 rounded-full bg-white"></span>
-                        @endif
-                    </a>
+                <!-- 4. Combats -->
+                @php $isBattle = request()->routeIs('battles.*'); @endphp
+                <a href="{{ route('battles.index') }}" 
+                   class="relative flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-300 {{ $isBattle ? 'text-shinobi-dark bg-shinobi-chakra shadow-lg shadow-shinobi-chakra/40 font-bold' : 'text-slate-400 hover:text-white' }}">
+                    <i class="bi bi-lightning-charge text-base leading-none"></i>
+                    <span class="font-mono text-[9px] font-bold mt-0.5">Combats</span>
+                    @if($isBattle)
+                        <span class="absolute -bottom-1 w-1 h-1 rounded-full bg-shinobi-dark"></span>
+                    @endif
+                </a>
 
-                    <!-- 2. Tournois -->
-                    @php $isTourn = request()->routeIs('tournaments.*'); @endphp
-                    <a href="{{ route('tournaments.open-list') }}" 
-                       class="relative flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-300 {{ $isTourn ? 'text-shinobi-dark bg-shinobi-gold shadow-lg shadow-shinobi-gold/40' : 'text-slate-400 hover:text-white' }}">
-                        <i class="bi bi-trophy text-base leading-none"></i>
-                        <span class="font-mono text-[9px] font-bold mt-0.5">Tournois</span>
-                        @if($isTourn)
-                            <span class="absolute -bottom-1 w-1 h-1 rounded-full bg-shinobi-dark"></span>
-                        @endif
-                    </a>
-
-                    <!-- 3. Stratégies -->
-                    @php $isStrat = request()->routeIs('strategies.*'); @endphp
-                    <a href="{{ route('strategies.index') }}" 
-                       class="relative flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-300 {{ $isStrat ? 'text-white bg-white/20 shadow-lg border border-white/30' : 'text-slate-400 hover:text-white' }}">
-                        <i class="bi bi-sliders text-base leading-none"></i>
-                        <span class="font-mono text-[9px] font-bold mt-0.5">Tactique</span>
-                        @if($isStrat)
-                            <span class="absolute -bottom-1 w-1 h-1 rounded-full bg-shinobi-gold"></span>
-                        @endif
-                    </a>
-
-                    <!-- 4. Combats -->
-                    @php $isBattle = request()->routeIs('battles.*'); @endphp
-                    <a href="{{ route('battles.index') }}" 
-                       class="relative flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-300 {{ $isBattle ? 'text-shinobi-dark bg-shinobi-chakra shadow-lg shadow-shinobi-chakra/40 font-bold' : 'text-slate-400 hover:text-white' }}">
-                        <i class="bi bi-lightning-charge text-base leading-none"></i>
-                        <span class="font-mono text-[9px] font-bold mt-0.5">Combats</span>
-                        @if($isBattle)
-                            <span class="absolute -bottom-1 w-1 h-1 rounded-full bg-shinobi-dark"></span>
-                        @endif
-                    </a>
-
-                    <!-- 5. Classement -->
-                    @php $isLead = request()->routeIs('leaderboard.*'); @endphp
-                    <a href="{{ route('leaderboard.index') }}" 
-                       class="relative flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-300 {{ $isLead ? 'text-white bg-shinobi-red shadow-lg shadow-shinobi-red/40' : 'text-slate-400 hover:text-white' }}">
-                        <i class="bi bi-bar-chart-line text-base leading-none"></i>
-                        <span class="font-mono text-[9px] font-bold mt-0.5">Rang</span>
-                        @if($isLead)
-                            <span class="absolute -bottom-1 w-1 h-1 rounded-full bg-white"></span>
-                        @endif
-                    </a>
-                @endguest
+                <!-- 5. Classement -->
+                @php $isLead = request()->routeIs('leaderboard.*'); @endphp
+                <a href="{{ route('leaderboard.index') }}" 
+                   class="relative flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-300 {{ $isLead ? 'text-white bg-shinobi-red shadow-lg shadow-shinobi-red/40' : 'text-slate-400 hover:text-white' }}">
+                    <i class="bi bi-bar-chart-line text-base leading-none"></i>
+                    <span class="font-mono text-[9px] font-bold mt-0.5">Rang</span>
+                    @if($isLead)
+                        <span class="absolute -bottom-1 w-1 h-1 rounded-full bg-white"></span>
+                    @endif
+                </a>
 
             </div>
         </nav>
     </div>
+    @endauth
 
     <!-- Pass Request Decision Notification Modal (Alpine.js) -->
     @auth
