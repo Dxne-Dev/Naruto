@@ -6,8 +6,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Cockpit Arbitre Game Master') - Otaku Arena</title>
 
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="{{ asset('admin-assets/images/favicon.ico') }}">
+    <!-- Favicon Officiel Otaku Arena -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/otaku-arena-favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/otaku-arena-favicon.png') }}">
 
     <!-- Library / Plugin Css Build -->
     <link rel="stylesheet" href="{{ asset('admin-assets/css/core/libs.min.css') }}">

@@ -6,6 +6,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Otaku Arena — L\'Arène Shinobi des Tournois de l\'Examen Chūnin' }}</title>
 
+    <!-- Favicon Officiel Otaku Arena -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/otaku-arena-favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/otaku-arena-favicon.png') }}">
+
     <!-- Google Fonts Inter, Newsreader & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,9 +37,11 @@
                 
                 <!-- Logo Otaku Arena -->
                 <div class="flex items-center gap-3">
-                    <a href="{{ auth()->check() ? route('fighters.my-character') : route('dashboard') }}" class="flex items-center gap-2 group">
-                        <div class="w-8 h-8 rounded-full bg-shinobi-red/10 border border-shinobi-red flex items-center justify-center text-shinobi-red shadow-lg group-hover:scale-105 transition-transform">
-                            <i class="bi bi-fire text-base"></i>
+                    <a href="{{ auth()->check() ? route('fighters.my-character') : route('dashboard') }}" class="flex items-center gap-2.5 group">
+                        <div class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-shinobi-red/60 shadow-lg shadow-shinobi-red/25 group-hover:scale-105 transition-transform bg-shinobi-card flex items-center justify-center shrink-0">
+                            <img src="{{ asset('images/otaku-arena-logo-transparent.png') }}" 
+                                 alt="Otaku Arena Logo" 
+                                 class="w-full h-full object-contain p-0.5">
                         </div>
                         <div>
                             <span class="font-mono font-black text-lg sm:text-xl tracking-wider text-white flex items-center gap-1">
