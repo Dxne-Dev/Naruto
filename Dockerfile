@@ -4,6 +4,7 @@ FROM php:8.3-fpm-alpine
 RUN apk add --no-cache \
     nginx \
     curl \
+    ca-certificates \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
@@ -14,7 +15,8 @@ RUN apk add --no-cache \
     nodejs \
     npm \
     icu-dev \
-    oniguruma-dev
+    oniguruma-dev \
+    && update-ca-certificates
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql zip bcmath intl opcache
