@@ -31,7 +31,8 @@
 <body class="min-h-full flex flex-col bg-shinobi-dark text-slate-200 font-sans antialiased selection:bg-shinobi-red selection:text-white">
 
     <!-- Top Navigation Bar (Fidèle à la maquette Otaku Arena) -->
-    <header class="sticky top-0 z-50 bg-shinobi-dark/95 backdrop-blur border-b border-shinobi-border">
+    <!-- Affichée uniquement sur desktop, ou sur mobile une fois connecté après inscription -->
+    <header class="{{ auth()->check() ? 'block' : 'hidden md:block' }} sticky top-0 z-50 bg-shinobi-dark/95 backdrop-blur border-b border-shinobi-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 
@@ -167,13 +168,15 @@
                             </div>
                         </div>
                     @else
-                        <!-- Maquette Panneau 1 : Bouton "Se connecter" et "S'inscrire" -->
-                        <a href="{{ route('login') }}" class="font-mono text-xs text-slate-300 hover:text-white uppercase tracking-wider px-3 py-2 transition">
-                            Se connecter
-                        </a>
-                        <a href="{{ route('register') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-shinobi-red hover:bg-shinobi-red-hover text-white text-xs font-mono font-bold uppercase tracking-wider transition shadow-lg shadow-shinobi-red/20">
-                            S'inscrire
-                        </a>
+                        <!-- Maquette Panneau 1 : Bouton "Se connecter" et "S'inscrire" (affichés uniquement en desktop md+) -->
+                        <div class="hidden md:flex items-center gap-2">
+                            <a href="{{ route('login') }}" class="font-mono text-xs text-slate-300 hover:text-white uppercase tracking-wider px-3 py-2 transition">
+                                Se connecter
+                            </a>
+                            <a href="{{ route('register') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-shinobi-red hover:bg-shinobi-red-hover text-white text-xs font-mono font-bold uppercase tracking-wider transition shadow-lg shadow-shinobi-red/20">
+                                S'inscrire
+                            </a>
+                        </div>
                     @endauth
                 </div>
             </div>
