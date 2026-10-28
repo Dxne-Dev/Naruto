@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\PassRequestAdminController;
 use App\Http\Controllers\Admin\PortraitAdminController;
 use App\Http\Controllers\Admin\TournamentAdminController;
 use App\Http\Controllers\Admin\UserAdminController;
@@ -125,10 +126,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/portraits/{fighter}/upload', [PortraitAdminController::class, 'upload'])->name('portraits.upload');
 
         // Pass Verification Requests (/admin/pass-requests)
-        Route::get('/pass-requests', [\App\Http\Controllers\Admin\PassRequestAdminController::class, 'index'])->name('pass-requests.index');
-        Route::post('/pass-requests/{passRequest}/approve', [\App\Http\Controllers\Admin\PassRequestAdminController::class, 'approve'])->name('pass-requests.approve');
-        Route::post('/pass-requests/{passRequest}/reject', [\App\Http\Controllers\Admin\PassRequestAdminController::class, 'reject'])->name('pass-requests.reject');
-        Route::delete('/pass-requests/{passRequest}', [\App\Http\Controllers\Admin\PassRequestAdminController::class, 'destroy'])->name('pass-requests.destroy');
+        Route::get('/pass-requests', [PassRequestAdminController::class, 'index'])->name('pass-requests.index');
+        Route::post('/pass-requests/{passRequest}/approve', [PassRequestAdminController::class, 'approve'])->name('pass-requests.approve');
+        Route::post('/pass-requests/{passRequest}/reject', [PassRequestAdminController::class, 'reject'])->name('pass-requests.reject');
+        Route::delete('/pass-requests/{passRequest}', [PassRequestAdminController::class, 'destroy'])->name('pass-requests.destroy');
 
         // Admin Profile (/admin/profile)
         Route::get('/profile', [AdminProfileController::class, 'edit'])->name('profile.edit');

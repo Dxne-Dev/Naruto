@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Battle;
 use App\Models\Fighter;
 use App\Models\MatchGame;
+use App\Models\Tournament;
+use App\Models\TournamentEntry;
 use App\Services\BattleEngine;
 use App\Services\BattleNarratorService;
 use App\Services\GroqBattleNarratorService;
@@ -43,7 +45,7 @@ class BattleController extends Controller
                 ->first();
 
             // Check if user is registered in an open/active tournament
-            $myActiveTournamentEntry = \App\Models\TournamentEntry::where('fighter_id', $fighter->id)
+            $myActiveTournamentEntry = TournamentEntry::where('fighter_id', $fighter->id)
                 ->whereHas('tournament', function ($q) {
                     $q->whereIn('status', ['registration', 'locked', 'in_progress']);
                 })
@@ -100,7 +102,7 @@ class BattleController extends Controller
         $communityBattles = $communityBattlesQuery->paginate(12, ['*'], 'arena_page');
 
         // Active open tournament for quick registration CTA if user is not yet registered
-        $openTournament = \App\Models\Tournament::where('status', 'registration')
+        $openTournament = Tournament::where('status', 'registration')
             ->withCount('entries')
             ->latest()
             ->first();
@@ -162,7 +164,7 @@ class BattleController extends Controller
 
             $hpA = $lastLog ? $lastLog->hp_remaining_a : $maxHpA;
             $hpB = $lastLog ? $lastLog->hp_remaining_b : $maxHpB;
-            
+
             // Chakra remaining (with fallback calculation if battle was simulated with old zero-chakra records)
             $chkA = $lastLog?->chakra_remaining_a;
             $chkB = $lastLog?->chakra_remaining_b;

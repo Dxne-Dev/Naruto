@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tournament;
-use App\Models\TournamentEntry;
 use App\Services\TournamentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -74,7 +73,7 @@ class PrivateTournamentController extends Controller
 
         // Generate unique readable room code (e.g. SHINOBI-742)
         do {
-            $code = strtoupper(Str::random(3)) . '-' . mt_rand(100, 999);
+            $code = strtoupper(Str::random(3)).'-'.mt_rand(100, 999);
         } while (Tournament::where('room_code', $code)->exists());
 
         $tournament = Tournament::create([
@@ -219,7 +218,7 @@ class PrivateTournamentController extends Controller
             return redirect()->route('tournaments.private.lobby', $tournament)
                 ->with('success', 'Le Tournoi Privé a été simulé avec succès ! Les combats et les récompenses sont distribués.');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Erreur lors du lancement : ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors du lancement : '.$e->getMessage());
         }
     }
 }

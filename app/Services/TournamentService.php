@@ -61,7 +61,7 @@ class TournamentService
                 ->exists();
 
             if ($duplicateDeviceInRoom) {
-                throw new \RuntimeException("Un combattant issu de cet appareil participe déjà à ce salon privé. Le multicompte est interdit.");
+                throw new \RuntimeException('Un combattant issu de cet appareil participe déjà à ce salon privé. Le multicompte est interdit.');
             }
         }
 
