@@ -126,6 +126,7 @@ Route::middleware('auth')->group(function () {
 
         // Wizard of Oz Portrait Management (/admin/portraits)
         Route::get('/portraits', [PortraitAdminController::class, 'index'])->name('portraits.index');
+        Route::get('/portraits/{fighter}/download-source', [PortraitAdminController::class, 'downloadSourcePhoto'])->name('portraits.download-source');
         Route::post('/portraits/{fighter}/upload', [PortraitAdminController::class, 'upload'])->name('portraits.upload');
 
         // Pass Verification Requests (/admin/pass-requests)

@@ -121,11 +121,16 @@
                 <div class="relative rounded-2xl overflow-hidden border border-shinobi-border/80 aspect-4/5 bg-black/90 shadow-2xl group">
                     
                     <!-- Avatar réel en arrière-plan (fortement flouté et assombri si non payé) -->
-                    <img src="{{ $fighter->portrait_path ?? ($fighter->source_photo_path ?? asset('images/naruto-hero.png')) }}" 
+                    @php
+                        $portraitReady = $hasPaidPass && $fighter->portrait_status === 'ready' && !empty($fighter->portrait_path);
+                        $portraitPending = $hasPaidPass && !$portraitReady;
+                    @endphp
+
+                    <img src="{{ $fighter->portrait_url ?? ($fighter->source_photo_url ?? asset('images/naruto-hero.png')) }}" 
                          alt="{{ $fighter->name }}" 
-                         class="w-full h-full object-cover object-top {{ !$hasPaidPass ? 'filter blur-2xl scale-110 opacity-30 brightness-50' : 'group-hover:scale-105' }} transition-all duration-700">
+                         class="w-full h-full object-cover object-top {{ (!$hasPaidPass || $portraitPending) ? 'filter blur-2xl scale-110 opacity-30 brightness-50' : 'group-hover:scale-105' }} transition-all duration-700">
                     
-                    <!-- Masquage Premier Plan : Image Cadenas Locked officielle couvrant tout le cadre -->
+                    <!-- Masquage Premier Plan : Image Cadenas Locked officielle si non payé -->
                     @if(!$hasPaidPass)
                         <!-- Image Locked couvrant l'intégralité du cadre -->
                         <div class="absolute inset-0 z-10 select-none">
@@ -142,6 +147,56 @@
                                     <span>DÉBLOQUER MON PERSONNAGE</span>
                                     <i class="bi bi-arrow-right"></i>
                                 </a>
+                            </div>
+                        </div>
+                    @elseif($portraitPending)
+                        <!-- Masquage Pass Payé mais Portrait en Attente de Forge par l'Admin : Image Mission Passed + Timer Dynamique de 30 min -->
+                        <div class="absolute inset-0 z-10 select-none flex flex-col justify-between p-3.5 bg-black/60 backdrop-blur-sm"
+                             x-data="{
+                                orderedAt: {{ $fighter->portrait_ordered_at ? $fighter->portrait_ordered_at->timestamp * 1000 : 'Date.now()' }},
+                                totalMs: 30 * 60 * 1000,
+                                remainingText: '30:00',
+                                init() {
+                                    const updateTimer = () => {
+                                        const elapsed = Date.now() - this.orderedAt;
+                                        const remaining = Math.max(0, this.totalMs - elapsed);
+                                        const mins = Math.floor(remaining / 60000);
+                                        const secs = Math.floor((remaining % 60000) / 1000);
+                                        this.remainingText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                                    };
+                                    updateTimer();
+                                    setInterval(updateTimer, 1000);
+                                }
+                             }">
+                            
+                            <!-- Badge Statut en haut -->
+                            <div class="flex items-center justify-between">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-shinobi-gold/20 border border-shinobi-gold/50 text-shinobi-gold text-[10px] font-mono font-bold tracking-wider uppercase">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-shinobi-gold animate-ping"></span>
+                                    Forge en cours
+                                </span>
+                                <div class="px-2.5 py-1 rounded-full bg-black/80 border border-white/20 text-white font-mono text-[11px] font-black flex items-center gap-1 shadow">
+                                    <i class="bi bi-clock-history text-shinobi-gold"></i>
+                                    <span x-text="remainingText">30:00</span>
+                                </div>
+                            </div>
+
+                            <!-- Image Mission Passed Overlay au centre -->
+                            <div class="my-auto text-center px-2">
+                                <img src="{{ asset('images/mission-passed-overlay.png') }}" 
+                                     alt="Mission Validée - Forge en Cours" 
+                                     class="w-full max-h-36 object-contain mx-auto drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)] animate-pulse">
+                                <h4 class="mt-2 font-serif font-black text-white text-base sm:text-lg uppercase tracking-wider drop-shadow">
+                                    Pacte Shinobi Scellé
+                                </h4>
+                                <p class="text-[11px] font-mono text-slate-300 leading-snug mt-1">
+                                    Les Maîtres Artisans forgent actuellement ton portrait officiel HD à partir de ta photo.
+                                </p>
+                            </div>
+
+                            <!-- Pied de carte en attente -->
+                            <div class="bg-shinobi-dark/90 border border-shinobi-gold/30 rounded-xl p-2 text-center font-mono text-[10px] text-shinobi-gold">
+                                <i class="bi bi-hourglass-split me-1"></i> Notification automatique dès livraison (~30 min max)
                             </div>
                         </div>
                     @endif

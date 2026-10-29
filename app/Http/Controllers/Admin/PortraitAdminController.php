@@ -58,6 +58,31 @@ class PortraitAdminController extends Controller
     }
 
     /**
+     * Download the fighter's source photo directly.
+     */
+    public function downloadSourcePhoto(Fighter $fighter)
+    {
+        $path = $fighter->source_photo_path;
+
+        if (! $path) {
+            abort(404, 'Aucune photo source enregistrée pour ce combattant.');
+        }
+
+        // Si le chemin commence par /storage/
+        $cleanPath = preg_replace('#^/storage/#', '', $path);
+        if (Storage::disk('public')->exists($cleanPath)) {
+            return Storage::disk('public')->download($cleanPath, "photo_source_shinobi_{$fighter->id}.jpg");
+        }
+
+        // Si c'est un fichier local direct
+        if (file_exists(public_path($path))) {
+            return response()->download(public_path($path), "photo_source_shinobi_{$fighter->id}.jpg");
+        }
+
+        return redirect($fighter->source_photo_url);
+    }
+
+    /**
      * Upload and publish the generated portrait for a fighter.
      */
     public function upload(Request $request, Fighter $fighter): RedirectResponse

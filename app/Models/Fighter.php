@@ -110,6 +110,38 @@ class Fighter extends Model
     }
 
     /**
+     * Get accessible URL for source photo.
+     */
+    public function getSourcePhotoUrlAttribute(): ?string
+    {
+        if (! $this->source_photo_path) {
+            return null;
+        }
+
+        if (str_starts_with($this->source_photo_path, 'http://') || str_starts_with($this->source_photo_path, 'https://')) {
+            return $this->source_photo_path;
+        }
+
+        return asset(ltrim($this->source_photo_path, '/'));
+    }
+
+    /**
+     * Get accessible URL for forged portrait.
+     */
+    public function getPortraitUrlAttribute(): ?string
+    {
+        if (! $this->portrait_path) {
+            return null;
+        }
+
+        if (str_starts_with($this->portrait_path, 'http://') || str_starts_with($this->portrait_path, 'https://')) {
+            return $this->portrait_path;
+        }
+
+        return asset(ltrim($this->portrait_path, '/'));
+    }
+
+    /**
      * Calculate Max HP based on Databook Endurance: HP = Stat_Endurance * 100 (x 1.35 if Uzumaki).
      */
     public function getMaxHp(): int
