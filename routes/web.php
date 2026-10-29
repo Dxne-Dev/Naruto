@@ -19,10 +19,20 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StrategyController;
 use App\Http\Controllers\TournamentController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 // Public & Dashboard
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
+
+// Secure Local/Production Storage Static Serving Fallback (if symlink missing or restricted)
+Route::get('/storage/{path}', function (string $path) {
+    if (! Storage::disk('public')->exists($path)) {
+        abort(404);
+    }
+
+    return Storage::disk('public')->response($path);
+})->where('path', '.*')->name('storage.local-fallback');
 
 // Guest Auth Routes (Protection brute-force et multi-inscriptions)
 Route::middleware('guest')->group(function () {

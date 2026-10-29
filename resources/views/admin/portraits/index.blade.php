@@ -62,7 +62,7 @@
                                 <span class="d-block text-muted font-monospace small mb-2 text-uppercase fw-bold">Photo Source Envoyée</span>
                                 @if($fighter->source_photo_path)
                                     <div class="position-relative mx-auto rounded-3 overflow-hidden border shadow-sm" style="max-width: 180px; height: 180px; background: #000;">
-                                        <img src="{{ $fighter->source_photo_url }}" alt="Photo Source" class="w-100 h-100 object-fit-cover" onerror="this.onerror=null; this.src='{{ asset('images/locked-avatar.png') }}';">
+                                        <img src="{{ $fighter->source_photo_url }}" alt="Photo Source de {{ $fighter->name }}" class="w-100 h-100 object-fit-cover">
                                     </div>
                                     <a href="{{ route('admin.portraits.download-source', $fighter) }}" class="btn btn-sm btn-outline-dark mt-2 font-monospace" style="font-size: 11px;">
                                         <i class="bi bi-download me-1"></i> Télécharger Photo
