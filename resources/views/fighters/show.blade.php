@@ -120,9 +120,9 @@
                 <!-- Carte Portrait Avatar -->
                 <div class="relative rounded-2xl overflow-hidden border border-shinobi-border/80 aspect-4/5 bg-black/90 shadow-2xl group">
                     
-                    <!-- Avatar réel en arrière-plan (fortement flouté et assombri si non payé) -->
+                    <!-- Avatar réel en arrière-plan -->
                     @php
-                        $portraitReady = $hasPaidPass && $fighter->portrait_status === 'ready' && !empty($fighter->portrait_path);
+                        $portraitReady = $fighter->portrait_status === 'ready' && !empty($fighter->portrait_path);
                         $portraitPending = $hasPaidPass && !$portraitReady;
                     @endphp
 
@@ -201,8 +201,8 @@
                         </div>
                     @endif
 
-                    <!-- Sceau Kanji discret en filigrane sur le portrait (si débloqué) -->
-                    @if($hasPaidPass)
+                    <!-- Sceau Kanji discret en filigrane sur le portrait (si débloqué et portrait prêt) -->
+                    @if($hasPaidPass && $portraitReady)
                         <div class="absolute top-2 right-3 font-serif text-4xl font-black text-white/10 select-none pointer-events-none">
                             {{ $villageInfo['kanji'] }}
                         </div>
