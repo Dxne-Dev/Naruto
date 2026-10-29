@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+# Ensure storage symlink exists
+php artisan storage:link || true
+
 # Run production cache & optimizations
 php artisan config:cache || true
 php artisan route:cache || true
