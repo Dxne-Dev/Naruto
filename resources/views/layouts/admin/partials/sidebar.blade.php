@@ -87,8 +87,7 @@
                         <i class="icon text-primary">
                             <i class="bi bi-gift-fill fs-5"></i>
                         </i>
-                        <span class="item-name fw-bold">Cadeaux Admin</span>
-                        <span class="badge bg-primary text-white ms-auto font-mono" style="font-size: 10px;">PRO</span>
+                        <span class="item-name">Cadeaux Admin</span>
                     </a>
                 </li>
 
