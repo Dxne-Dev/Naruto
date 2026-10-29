@@ -16,13 +16,12 @@ class StrategyController extends Controller
     /**
      * Show attack and defense strategy setup.
      */
-    public function index(): View|RedirectResponse
+    public function index(): View
     {
         $fighter = auth()->user()->fighter;
 
         if (! $fighter) {
-            return redirect()->route('onboarding.index')
-                ->with('info', 'Crée ton shinobi d\'abord pour configurer tes stratégies.');
+            return view('strategies.no_fighter');
         }
 
         $currentStance = $fighter->strategy_stance ?? 'balanced';

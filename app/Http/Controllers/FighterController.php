@@ -65,30 +65,11 @@ class FighterController extends Controller
     }
 
     /**
-     * Show the fighter creation page (Rituels des Roues Ninja).
+     * Redirect legacy fighter creation page to the official onboarding wizard.
      */
-    public function create(Request $request): View|RedirectResponse
+    public function create(Request $request): RedirectResponse
     {
-        $user = $request->user();
-        if ($user && $user->fighter()->exists()) {
-            return redirect()->route('fighters.index')
-                ->with('info', 'Tu possèdes déjà un shinobi actif enregistré dans le registre des ninjas.');
-        }
-
-        $clans = FighterGenerator::CLANS;
-        $elements = FighterGenerator::ELEMENTS;
-        $specializations = FighterGenerator::SPECIALIZATIONS;
-        $villages = FighterGenerator::VILLAGES;
-        $initialCandidate = $this->generator->generateCandidate();
-
-        return view('fighters.create', [
-            'clans' => $clans,
-            'elements' => $elements,
-            'specializations' => $specializations,
-            'villages' => $villages,
-            'initialCandidate' => $initialCandidate,
-            'wheelTokens' => $user?->wheel_tokens ?? 3,
-        ]);
+        return redirect()->route('onboarding.index');
     }
 
     /**

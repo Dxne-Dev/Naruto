@@ -77,7 +77,7 @@
                 @auth
                     @if($tournament->status === 'registration')
                         @if(!$userFighter)
-                            <a href="{{ route('fighters.create') }}" class="rounded-xl bg-shinobi-red hover:bg-shinobi-red-hover text-white px-4 py-2.5 font-mono text-xs font-bold shadow-lg shadow-shinobi-red/25 transition">
+                            <a href="{{ route('onboarding.index') }}" class="rounded-xl bg-shinobi-red hover:bg-shinobi-red-hover text-white px-4 py-2.5 font-mono text-xs font-bold shadow-lg shadow-shinobi-red/25 transition">
                                 Forger un shinobi pour s'inscrire ▸
                             </a>
                         @elseif($isRegistered)
