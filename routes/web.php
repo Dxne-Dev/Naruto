@@ -18,6 +18,7 @@ use App\Http\Controllers\PrivateTournamentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StrategyController;
 use App\Http\Controllers\TournamentController;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -27,6 +28,12 @@ Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leade
 
 // Secure Local/Production Storage Static Serving Fallback
 Route::get('/storage/{path}', function (string $path) {
+    Log::info('GET /storage route hit:', [
+        'requested_path' => $path,
+        'public_disk_exists' => Storage::disk('public')->exists($path),
+        'file_exists_direct' => file_exists(storage_path('app/public/'.ltrim($path, '/'))),
+    ]);
+
     // 1. Check in storage/app/public/
     if (Storage::disk('public')->exists($path)) {
         return Storage::disk('public')->response($path);

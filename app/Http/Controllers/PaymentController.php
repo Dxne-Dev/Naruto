@@ -138,7 +138,27 @@ class PaymentController extends Controller
             'source_photo_file.max' => 'L\'image ne doit pas dépasser 6 Mo.',
         ]);
 
-        $path = $request->file('source_photo_file')->store('source_photos', 'public');
+        $uploadedFile = $request->file('source_photo_file');
+        $originalName = $uploadedFile->getClientOriginalName();
+        $fileSize = $uploadedFile->getSize();
+        $mimeType = $uploadedFile->getMimeType();
+
+        $path = $uploadedFile->store('source_photos', 'public');
+        $fullDiskPath = storage_path('app/public/'.$path);
+        $existsOnDisk = file_exists($fullDiskPath);
+
+        Log::info('PaymentController Photo Upload Debug:', [
+            'user_id' => $user->id,
+            'fighter_id' => $fighter->id,
+            'original_name' => $originalName,
+            'file_size_bytes' => $fileSize,
+            'mime_type' => $mimeType,
+            'stored_path' => $path,
+            'full_disk_path' => $fullDiskPath,
+            'exists_immediately_on_disk' => $existsOnDisk,
+            'storage_url' => Storage::url($path),
+        ]);
+
         $fighter->update([
             'source_photo_path' => Storage::url($path),
             'portrait_status' => $user->has_paid_microtransaction ? 'pending' : $fighter->portrait_status,
