@@ -32,7 +32,12 @@ class User extends Authenticatable
 
     public const ROLE_PLAYER = 'player';
 
-    public const ROLE_GAME_MASTER = 'game_master';
+    public const ROLE_ADMIN = 'admin';
+
+    /**
+     * Backward compatibility alias.
+     */
+    public const ROLE_GAME_MASTER = self::ROLE_ADMIN;
 
     /**
      * Check if the user is currently online based on active session (last 5 minutes).
@@ -48,11 +53,19 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if the user is a Game Master.
+     * Check if the user is an Admin / Game Master.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN || $this->role === 'game_master';
+    }
+
+    /**
+     * Check if the user is a Game Master (alias for isAdmin).
      */
     public function isGameMaster(): bool
     {
-        return $this->role === self::ROLE_GAME_MASTER;
+        return $this->isAdmin();
     }
 
     /**

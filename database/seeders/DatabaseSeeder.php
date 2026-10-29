@@ -16,14 +16,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(TournamentService $tournamentService): void
     {
-        // 1. Game Master account
-        $gm = User::create([
-            'username' => 'gamemaster',
-            'name' => 'Grand Arbitre de l\'Arène',
-            'email' => 'gm@otaku-arena.com',
-            'password' => Hash::make('secret123'),
-            'role' => User::ROLE_GAME_MASTER,
-        ]);
+        // 1. Admin account (Dxne)
+        $admin = User::updateOrCreate(
+            ['username' => 'Dxne'],
+            [
+                'name' => 'Dxne Admin',
+                'email' => 'dxne@otaku-arena.com',
+                'password' => Hash::make('Secret123'),
+                'role' => User::ROLE_ADMIN,
+            ]
+        );
 
         // 2. Demo Player 1
         $player1 = User::create([
