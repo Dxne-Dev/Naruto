@@ -1,66 +1,87 @@
-@extends('layouts.app', ['title' => '404 — Page introuvable | Otaku Arena', 'isErrorPage' => true])
+@extends('layouts.app', ['title' => '404 — Not Found | Otaku Arena', 'isErrorPage' => true])
+
+@push('styles')
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Sedgwick+Ave+Display&display=swap" rel="stylesheet">
+<style>
+    .font-brush {
+        font-family: 'Permanent Marker', 'Sedgwick Ave Display', cursive, sans-serif;
+    }
+</style>
+@endpush
 
 @section('content')
-<div class="relative w-full min-h-[calc(100vh-4rem)] flex items-center bg-[#0E0D0F] overflow-hidden -mt-0">
-    {{-- Background Artwork 16:9 cinématographique avec Madara à droite --}}
+<div class="relative w-full min-h-[calc(100vh-4rem)] flex items-center bg-[#0E0D0F] overflow-hidden">
+    {{-- Image d'arrière-plan 16:9 cinématographique officielle (Madara) --}}
     <div class="absolute inset-0 z-0 pointer-events-none">
         <img src="{{ asset('images/errors/404-madara.jpg') }}" 
-             alt="Madara Uchiha - Page introuvable" 
-             class="w-full h-full object-cover object-center filter brightness-95">
-        {{-- Dégradés cinématographiques doux pour fondre le texte à gauche sans masquer Madara --}}
-        <div class="absolute inset-0 bg-gradient-to-r from-[#0E0D0F]/95 via-[#0E0D0F]/70 to-transparent w-full md:w-3/5"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-[#0E0D0F] via-transparent to-[#0E0D0F]/40"></div>
+             alt="Madara Uchiha - Fond 404" 
+             class="w-full h-full object-cover object-center">
+        {{-- Dégradé sombre sur la gauche pour détacher le texte --}}
+        <div class="absolute inset-0 bg-gradient-to-r from-[#0E0D0F]/90 via-[#0E0D0F]/50 to-transparent w-full md:w-1/2"></div>
     </div>
 
-    {{-- Contenu aligné à gauche --}}
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 w-full">
-        <div class="max-w-xl lg:max-w-2xl">
-            {{-- Badge d'alerte --}}
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-600 text-slate-300 text-xs font-mono font-bold tracking-widest uppercase mb-3">
-                <span class="w-2 h-2 rounded-full bg-slate-400"></span>
-                DIMENSION LOST
-            </div>
+    {{-- Calligraphie japonaise verticale à droite (うちは マダラ) --}}
+    <div class="hidden lg:flex flex-col items-center absolute right-8 sm:right-14 top-1/2 -translate-y-1/2 z-10 select-none pointer-events-none opacity-80">
+        <span class="text-xs sm:text-sm font-mono tracking-widest text-slate-300 [writing-mode:vertical-rl] mb-4">
+            うちは マダラ
+        </span>
+        <div class="w-7 h-7 rounded-full border border-slate-500/70 bg-black/60 flex items-center justify-center p-1 shadow-lg">
+            <span class="w-3.5 h-3.5 rounded-full bg-red-600"></span>
+        </div>
+    </div>
 
-            {{-- Code d'erreur géant en haut à gauche --}}
-            <div class="font-mono font-black text-6xl sm:text-8xl md:text-9xl tracking-tight text-slate-100 drop-shadow-[0_0_40px_rgba(255,255,255,0.3)] leading-none select-none">
+    {{-- Bloc de contenu gauche fidèle au modèle --}}
+    <div class="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-10 sm:py-16 w-full">
+        <div class="max-w-xl">
+            
+            {{-- Grand code d'erreur 404 en police Brush Shonen Blanche --}}
+            <div class="font-brush text-7xl sm:text-9xl md:text-[9.5rem] leading-none text-white drop-shadow-[0_4px_25px_rgba(255,255,255,0.4)] select-none italic tracking-normal">
                 404
             </div>
 
-            {{-- Titre juste au-dessous --}}
-            <h1 class="mt-2 font-mono font-extrabold text-2xl sm:text-4xl text-white tracking-wide uppercase flex items-center gap-3">
-                <i class="bi bi-compass text-slate-400"></i>
-                PAGE INTROUVABLE
+            {{-- Titre juste dessous en Brush blanc --}}
+            <h1 class="font-brush text-2xl sm:text-3xl md:text-4xl text-white tracking-wider uppercase mt-1 drop-shadow-[0_2px_15px_rgba(255,255,255,0.3)]">
+                NOT FOUND
             </h1>
 
-            {{-- Message explicatif --}}
-            <p class="mt-4 text-slate-300 text-sm sm:text-base leading-relaxed font-sans">
-                Cette page n'existe pas... ou a disparu dans les ruines d'une dimension parallèle. Même les plus redoutables ninjas peuvent perdre leur chemin. Reviens au village ou explore une autre section de l'arène.
+            {{-- Phrase d'accroche --}}
+            <h2 class="mt-4 font-sans font-bold text-base sm:text-lg text-white">
+                Cette page n'existe pas... ou a disparu dans une autre dimension.
+            </h2>
+
+            {{-- Explication --}}
+            <p class="mt-1.5 text-xs sm:text-sm text-slate-300 font-sans leading-relaxed max-w-md">
+                Même les plus grands ninjas se perdent parfois.<br class="hidden sm:inline">
+                Reviens à l'accueil ou explore l'arène.
             </p>
 
-            {{-- Citation thématique --}}
-            <div class="mt-5 pl-4 border-l-2 border-slate-600 bg-white/5 py-2.5 pr-4 rounded-r-lg">
-                <p class="italic text-xs sm:text-sm text-slate-300 font-serif">
-                    « Dans ce monde, partout où il y a de la lumière, il y a aussi de l'ombre... Et ce que tu cherchais s'y est dissous. »
+            {{-- Boutons d'action empilés --}}
+            <div class="mt-7 flex flex-col items-start gap-3 w-full sm:w-auto">
+                <a href="{{ auth()->check() ? route('fighters.my-character') : route('dashboard') }}" 
+                   class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-sans font-bold text-xs uppercase tracking-wider bg-[#E50914] hover:bg-red-700 text-white shadow-lg shadow-red-900/40 transition-all hover:scale-105 active:scale-95">
+                    <i class="bi bi-house-door-fill text-sm"></i>
+                    <span>Retour à l'accueil</span>
+                </a>
+
+                <a href="{{ route('dashboard') }}" 
+                   class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-sans font-semibold text-xs tracking-wider bg-black/60 hover:bg-white/10 text-slate-200 border border-slate-600/70 hover:border-slate-400 transition-all hover:scale-105 active:scale-95">
+                    <i class="bi bi-eye text-sm"></i>
+                    <span>Découvrir le jeu</span>
+                </a>
+            </div>
+
+            {{-- Citation en bas --}}
+            <div class="mt-10 max-w-md">
+                <p class="italic text-[11px] sm:text-xs text-slate-400 font-sans leading-relaxed">
+                    « Le monde est rempli d'illusions... Et tu es l'une d'elles. »
                 </p>
-                <span class="block mt-1 text-[11px] font-mono text-slate-400 uppercase tracking-wider font-semibold">
+                <span class="block mt-1 text-[10px] font-sans font-semibold text-slate-400">
                     — Madara Uchiha
                 </span>
             </div>
 
-            {{-- Boutons d'action empilés --}}
-            <div class="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
-                <a href="{{ auth()->check() ? route('fighters.my-character') : route('dashboard') }}" 
-                   class="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-bold text-xs sm:text-sm tracking-wide bg-[#E50914] hover:bg-red-700 text-white shadow-lg shadow-[#E50914]/30 transition-all hover:scale-[1.02] active:scale-95 text-center">
-                    <i class="bi bi-house-door-fill"></i>
-                    Retour à l'accueil
-                </a>
-
-                <a href="{{ route('dashboard') }}" 
-                   class="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-semibold text-xs sm:text-sm tracking-wide bg-[#17161A]/90 hover:bg-[#201F25] text-slate-200 border border-slate-700/80 hover:border-slate-500 transition-all hover:scale-[1.02] active:scale-95 text-center">
-                    <i class="bi bi-trophy-fill text-amber-400"></i>
-                    Voir les tournois
-                </a>
-            </div>
         </div>
     </div>
 </div>

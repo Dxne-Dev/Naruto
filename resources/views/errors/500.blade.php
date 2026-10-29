@@ -1,66 +1,87 @@
-@extends('layouts.app', ['title' => '500 — Erreur Interne du Serveur | Otaku Arena', 'isErrorPage' => true])
+@extends('layouts.app', ['title' => '500 — Internal Server Error | Otaku Arena', 'isErrorPage' => true])
+
+@push('styles')
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Sedgwick+Ave+Display&display=swap" rel="stylesheet">
+<style>
+    .font-brush {
+        font-family: 'Permanent Marker', 'Sedgwick Ave Display', cursive, sans-serif;
+    }
+</style>
+@endpush
 
 @section('content')
-<div class="relative w-full min-h-[calc(100vh-4rem)] flex items-center bg-[#0E0D0F] overflow-hidden -mt-0">
-    {{-- Background Artwork 16:9 cinématographique avec Kakashi à droite --}}
+<div class="relative w-full min-h-[calc(100vh-4rem)] flex items-center bg-[#0E0D0F] overflow-hidden">
+    {{-- Image d'arrière-plan 16:9 cinématographique officielle (Kakashi) --}}
     <div class="absolute inset-0 z-0 pointer-events-none">
         <img src="{{ asset('images/errors/500-kakashi.jpg') }}" 
-             alt="Kakashi Hatake - Erreur Interne du Serveur" 
-             class="w-full h-full object-cover object-center filter brightness-95">
-        {{-- Dégradés cinématographiques doux pour fondre le texte à gauche sans masquer Kakashi --}}
-        <div class="absolute inset-0 bg-gradient-to-r from-[#0E0D0F]/95 via-[#0E0D0F]/70 to-transparent w-full md:w-3/5"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-[#0E0D0F] via-transparent to-[#0E0D0F]/40"></div>
+             alt="Kakashi Hatake - Fond 500" 
+             class="w-full h-full object-cover object-center">
+        {{-- Dégradé sombre bleuté sur la gauche pour détacher le texte --}}
+        <div class="absolute inset-0 bg-gradient-to-r from-[#0E0D0F]/90 via-[#0E0D0F]/50 to-transparent w-full md:w-1/2"></div>
     </div>
 
-    {{-- Contenu aligné à gauche --}}
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 w-full">
-        <div class="max-w-xl lg:max-w-2xl">
-            {{-- Badge d'alerte --}}
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#38E2F6]/15 border border-[#38E2F6]/40 text-[#38E2F6] text-xs font-mono font-bold tracking-widest uppercase mb-3">
-                <span class="w-2 h-2 rounded-full bg-[#38E2F6] animate-pulse"></span>
-                SYSTEM OVERLOAD
-            </div>
+    {{-- Calligraphie japonaise verticale à droite (はたけ カカシ) --}}
+    <div class="hidden lg:flex flex-col items-center absolute right-8 sm:right-14 top-1/2 -translate-y-1/2 z-10 select-none pointer-events-none opacity-80">
+        <span class="text-xs sm:text-sm font-mono tracking-widest text-slate-300 [writing-mode:vertical-rl] mb-4">
+            はたけ カカシ
+        </span>
+        <div class="w-7 h-7 rounded-full border border-cyan-500/70 bg-black/60 flex items-center justify-center p-1 shadow-lg shadow-cyan-900/40">
+            <i class="bi bi-fan text-cyan-400 text-xs"></i>
+        </div>
+    </div>
 
-            {{-- Code d'erreur géant en haut à gauche --}}
-            <div class="font-mono font-black text-6xl sm:text-8xl md:text-9xl tracking-tight text-[#38E2F6] drop-shadow-[0_0_40px_rgba(56,226,246,0.5)] leading-none select-none">
+    {{-- Bloc de contenu gauche fidèle au modèle --}}
+    <div class="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-10 sm:py-16 w-full">
+        <div class="max-w-xl">
+            
+            {{-- Grand code d'erreur 500 en police Brush Shonen Blanche/Chakra --}}
+            <div class="font-brush text-7xl sm:text-9xl md:text-[9.5rem] leading-none text-white drop-shadow-[0_4px_30px_rgba(56,226,246,0.6)] select-none italic tracking-normal">
                 500
             </div>
 
-            {{-- Titre juste au-dessous --}}
-            <h1 class="mt-2 font-mono font-extrabold text-2xl sm:text-4xl text-white tracking-wide uppercase flex items-center gap-3">
-                <i class="bi bi-lightning-charge-fill text-[#38E2F6]"></i>
+            {{-- Titre juste dessous en Brush blanc --}}
+            <h1 class="font-brush text-2xl sm:text-3xl md:text-4xl text-white tracking-wider uppercase mt-1 drop-shadow-[0_2px_15px_rgba(255,255,255,0.4)]">
                 INTERNAL SERVER ERROR
             </h1>
 
-            {{-- Message explicatif --}}
-            <p class="mt-4 text-slate-300 text-sm sm:text-base leading-relaxed font-sans">
-                Une surcharge de foudre a perturbé les flux du serveur ! Nos ninjas d'élite analysent la technique et restaurent l'équilibre du chakra. Merci pour ta patience, shinobi.
+            {{-- Phrase d'accroche --}}
+            <h2 class="mt-4 font-sans font-bold text-base sm:text-lg text-white">
+                Oups ! Quelque chose s'est mal passé...
+            </h2>
+
+            {{-- Explication --}}
+            <p class="mt-1.5 text-xs sm:text-sm text-slate-300 font-sans leading-relaxed max-w-md">
+                Notre équipe est déjà sur le coup pour régler le problème.<br class="hidden sm:inline">
+                Merci de ta patience, shinobi !
             </p>
 
-            {{-- Citation thématique --}}
-            <div class="mt-5 pl-4 border-l-2 border-[#38E2F6]/60 bg-[#38E2F6]/5 py-2.5 pr-4 rounded-r-lg">
-                <p class="italic text-xs sm:text-sm text-slate-300 font-serif">
-                    « Même face à la plus sombre des tempêtes, un shinobi ne renonce jamais. »
+            {{-- Boutons d'action empilés --}}
+            <div class="mt-7 flex flex-col items-start gap-3 w-full sm:w-auto">
+                <button onclick="window.location.reload()" 
+                        class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-sans font-bold text-xs uppercase tracking-wider bg-[#E50914] hover:bg-red-700 text-white shadow-lg shadow-red-900/40 transition-all hover:scale-105 active:scale-95 cursor-pointer">
+                    <i class="bi bi-arrow-clockwise text-sm"></i>
+                    <span>Réessayer</span>
+                </button>
+
+                <a href="{{ auth()->check() ? route('fighters.my-character') : route('dashboard') }}" 
+                   class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-sans font-semibold text-xs tracking-wider bg-black/60 hover:bg-white/10 text-slate-200 border border-slate-600/70 hover:border-slate-400 transition-all hover:scale-105 active:scale-95">
+                    <i class="bi bi-house-door-fill text-sm"></i>
+                    <span>Retour à l'accueil</span>
+                </a>
+            </div>
+
+            {{-- Citation en bas --}}
+            <div class="mt-10 max-w-md">
+                <p class="italic text-[11px] sm:text-xs text-slate-400 font-sans leading-relaxed">
+                    « Même dans l'obscurité la plus totale, le shinobi continue d'avancer. »
                 </p>
-                <span class="block mt-1 text-[11px] font-mono text-[#38E2F6] uppercase tracking-wider font-semibold">
+                <span class="block mt-1 text-[10px] font-sans font-semibold text-slate-400">
                     — Kakashi Hatake
                 </span>
             </div>
 
-            {{-- Boutons d'action empilés --}}
-            <div class="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
-                <button onclick="window.location.reload()" 
-                        class="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-bold text-xs sm:text-sm tracking-wide bg-[#38E2F6] hover:bg-[#20c5d9] text-[#0E0D0F] shadow-lg shadow-[#38E2F6]/30 transition-all hover:scale-[1.02] active:scale-95 text-center cursor-pointer">
-                    <i class="bi bi-arrow-clockwise"></i>
-                    Réessayer
-                </button>
-
-                <a href="{{ auth()->check() ? route('fighters.my-character') : route('dashboard') }}" 
-                   class="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-semibold text-xs sm:text-sm tracking-wide bg-[#17161A]/90 hover:bg-[#201F25] text-slate-200 border border-slate-700/80 hover:border-slate-500 transition-all hover:scale-[1.02] active:scale-95 text-center">
-                    <i class="bi bi-house-door-fill"></i>
-                    Retour à l'accueil
-                </a>
-            </div>
         </div>
     </div>
 </div>
