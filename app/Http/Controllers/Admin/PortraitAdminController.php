@@ -45,8 +45,12 @@ class PortraitAdminController extends Controller
         });
 
         $counts = [
-            'pending' => Fighter::where('portrait_status', 'pending')->count(),
-            'ready' => Fighter::where('portrait_status', 'ready')->count(),
+            'pending' => Fighter::where('portrait_status', 'pending')
+                ->whereHas('user', fn ($q) => $q->where('has_paid_microtransaction', true))
+                ->count(),
+            'ready' => Fighter::where('portrait_status', 'ready')
+                ->whereHas('user', fn ($q) => $q->where('has_paid_microtransaction', true))
+                ->count(),
             'total_paid' => Fighter::whereHas('user', fn ($q) => $q->where('has_paid_microtransaction', true))->count(),
         ];
 

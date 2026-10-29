@@ -240,20 +240,14 @@
                                 <i class="bi bi-check-circle-fill text-emerald-400 text-base"></i>
                                 <span>Photo enregistrée pour la gravure HD</span>
                             </div>
-                            <button type="button" @click="$refs.changePhotoForm.classList.toggle('hidden')" class="text-[11px] text-slate-400 hover:text-white underline">
-                                Changer
-                            </button>
-                        </div>
-                        <form x-ref="changePhotoForm" method="POST" action="{{ route('payment.upload-photo') }}" enctype="multipart/form-data" class="hidden p-4 rounded-2xl bg-shinobi-dark border border-shinobi-border mb-6 space-y-2">
-                            @csrf
-                            <span class="block font-mono text-xs text-slate-300">Nouvelle photo pour la forge du portrait :</span>
-                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                                <input type="file" name="source_photo_file" accept="image/*" required class="w-full text-xs font-mono text-slate-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-mono file:font-bold file:bg-white/10 file:text-white">
-                                <button type="submit" class="px-4 py-2 rounded-xl bg-shinobi-red hover:bg-shinobi-red-hover text-white font-mono text-xs font-bold uppercase shrink-0 transition">
-                                    Mettre à jour
+                            <form id="replace-photo-form" method="POST" action="{{ route('payment.upload-photo') }}" enctype="multipart/form-data" class="m-0 inline-flex items-center">
+                                @csrf
+                                <input type="file" id="change-photo-input" name="source_photo_file" accept="image/*" class="hidden" onchange="document.getElementById('replace-photo-form').submit()">
+                                <button type="button" onclick="document.getElementById('change-photo-input').click()" class="text-xs font-mono font-bold text-amber-400 hover:text-amber-300 underline cursor-pointer flex items-center gap-1">
+                                    <i class="bi bi-arrow-repeat"></i> Changer
                                 </button>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     @endif
 
                     <!-- MAIN CTA BUTTON: Redirect to Payment Window -->
