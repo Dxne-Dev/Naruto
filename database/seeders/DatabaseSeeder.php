@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(TournamentService $tournamentService): void
     {
+        // 0. Ensure all base Jutsus exist
+        $this->call(JutsuSeeder::class);
+
         // 1. Admin account (Dxne)
         $admin = User::updateOrCreate(
             ['username' => 'Dxne'],
