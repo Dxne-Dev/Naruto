@@ -267,7 +267,7 @@
                 <span class="font-mono text-xs font-bold text-shinobi-red uppercase tracking-wider">PHASE FINALE &bull; PORTRAIT OFFICIEL</span>
                 <h3 class="font-serif text-2xl sm:text-4xl font-black text-white uppercase">Importe la photo de ton Shinobi</h3>
                 <p class="font-sans text-xs sm:text-sm text-slate-300 max-w-lg mx-auto">
-                    Téléverse une photo ou choisis un visage prédéfini pour façonner ta carte de combattant officielle.
+                    Téléverse ta photo personnelle pour que l'Académie façonne ta carte de combattant officielle.
                 </p>
 
                 <div class="max-w-md mx-auto p-6 rounded-2xl border-2 border-dashed border-shinobi-border bg-shinobi-dark/60 space-y-4">
@@ -276,37 +276,18 @@
                     </div>
 
                     <div>
-                        <label for="shinobi-photo-upload" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-shinobi-red hover:bg-shinobi-red-hover text-white font-mono text-xs font-bold uppercase tracking-wider cursor-pointer transition shadow-md">
+                        <label for="shinobi-photo-upload" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-shinobi-red hover:bg-shinobi-red-hover text-white font-mono text-xs font-bold uppercase tracking-wider cursor-pointer transition shadow-lg shadow-shinobi-red/25">
                             <i class="bi bi-upload"></i>
-                            <span>SÉLECTIONNER UNE PHOTO</span>
+                            <span>SÉLECTIONNER MA PHOTO</span>
                         </label>
                         <input type="file" id="shinobi-photo-upload" name="source_photo_file" accept="image/*" class="hidden" onchange="handlePhotoUpload(this)">
-                        <span class="block font-mono text-[10px] text-slate-500 mt-1.5">JPG, PNG ou WebP (max 5 Mo)</span>
-                    </div>
-
-                    <div class="flex items-center gap-3">
-                        <div class="h-px bg-shinobi-border flex-1"></div>
-                        <span class="font-mono text-[10px] text-slate-400 uppercase">OU UN AVATAR PRÉDÉFINI</span>
-                        <div class="h-px bg-shinobi-border flex-1"></div>
-                    </div>
-
-                    <!-- Presets Avatars -->
-                    <div class="flex justify-center gap-2 flex-wrap font-mono text-xs">
-                        <button type="button" class="px-3 py-1.5 rounded-lg border border-shinobi-border bg-white/5 hover:bg-white/10 text-slate-200 transition" onclick="usePresetPhoto('https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&auto=format&fit=crop&q=80')">
-                            Shinobi Sombre
-                        </button>
-                        <button type="button" class="px-3 py-1.5 rounded-lg border border-shinobi-border bg-white/5 hover:bg-white/10 text-slate-200 transition" onclick="usePresetPhoto('https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&auto=format&fit=crop&q=80')">
-                            Kunoichi Éclair
-                        </button>
-                        <button type="button" class="px-3 py-1.5 rounded-lg border border-shinobi-border bg-white/5 hover:bg-white/10 text-slate-200 transition" onclick="usePresetPhoto('https://images.unsplash.com/photo-1563089145-599997674d42?w=400&auto=format&fit=crop&q=80')">
-                            Guerrier Flamme
-                        </button>
+                        <span class="block font-mono text-[10px] text-slate-500 mt-2">JPG, PNG ou WebP (max 5 Mo)</span>
                     </div>
                 </div>
 
                 <div class="pt-2">
                     <button type="button" class="font-mono text-xs text-slate-400 hover:text-white transition" onclick="finalizeCreation(false)">
-                        Ignorer cette étape et continuer sans carte personnalisée ▸
+                        Ignorer cette étape et continuer sans photo ▸
                     </button>
                 </div>
             </div>
@@ -348,9 +329,20 @@
                             </div>
                         </div>
 
-                        <!-- Portrait preview -->
-                        <div class="w-full h-48 rounded-2xl overflow-hidden border border-shinobi-border bg-black">
-                            <img id="card-portrait-img" src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&auto=format&fit=crop&q=80" alt="Shinobi Portrait" class="w-full h-full object-cover">
+                        <!-- Portrait preview : Affichage du locked-avatar avec cadenas -->
+                        <div class="relative w-full h-52 rounded-2xl overflow-hidden border border-shinobi-border bg-black select-none">
+                            <img id="card-portrait-img" 
+                                 src="{{ asset('images/locked-avatar.png') }}" 
+                                 alt="Avatar Verrouillé" 
+                                 class="w-full h-full object-cover object-center filter blur-[1px]">
+                            <div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center gap-1.5">
+                                <div class="w-10 h-10 rounded-full bg-shinobi-dark/90 border border-shinobi-gold/50 flex items-center justify-center text-shinobi-gold shadow-lg shadow-black/80">
+                                    <i class="bi bi-lock-fill text-lg"></i>
+                                </div>
+                                <span class="font-mono text-[9px] uppercase tracking-wider text-shinobi-gold font-bold bg-black/60 px-2 py-0.5 rounded-full border border-shinobi-gold/30">
+                                    Portrait en attente du Sceau
+                                </span>
+                            </div>
                         </div>
 
                         <!-- 8 Databook Stats Grid -->
@@ -679,26 +671,12 @@ function finalizeCreation(paid) {
 // ----------------------------------------------------
 // LOGIQUE DE LA CARTE SHINOBI (ÉTAPE 5)
 // ----------------------------------------------------
-let chosenPhotoUrl = 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&auto=format&fit=crop&q=80';
-
 function handlePhotoUpload(input) {
     if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            chosenPhotoUrl = e.target.result;
-            document.getElementById('input_source_photo_url').value = '';
-            triggerCardForge();
-        };
-        reader.readAsDataURL(input.files[0]);
+        // Clear preset text so the controller uses the uploaded file
+        document.getElementById('input_source_photo_url').value = '';
+        triggerCardForge();
     }
-}
-
-function usePresetPhoto(url) {
-    chosenPhotoUrl = url;
-    document.getElementById('input_source_photo_url').value = url;
-    const fileInput = document.getElementById('shinobi-photo-upload');
-    if (fileInput) fileInput.value = '';
-    triggerCardForge();
 }
 
 function triggerCardForge() {
@@ -710,7 +688,6 @@ function triggerCardForge() {
     document.getElementById('card-badge-clan').textContent = 'CLAN ' + chosenClan.toUpperCase();
     document.getElementById('card-badge-village').textContent = chosenVillage.toUpperCase();
     document.getElementById('card-display-sub').textContent = 'RANG : Genin • AFFINITÉ : ' + chosenElement;
-    document.getElementById('card-portrait-img').src = chosenPhotoUrl;
 
     const passiveText = clansData[chosenClan]?.passive || 'Volonté du Feu';
     document.getElementById('card-display-passive').innerHTML = '<i class="bi bi-shield-shaded text-emerald-400 mr-1"></i> Don Héréditaire : ' + passiveText;
