@@ -13,9 +13,14 @@ class DashboardController extends Controller
      */
     public function index(Request $request): View|RedirectResponse
     {
-        // Si l'utilisateur est déjà connecté, aucun accueil : rediriger directement vers mon personnage (ou création si pas de perso)
-        if ($request->user()) {
-            if ($request->user()->fighter) {
+        // Si l'utilisateur est déjà connecté
+        if ($user = $request->user()) {
+            // L'administrateur est immédiatement dirigé vers le cockpit admin
+            if ($user->isAdmin()) {
+                return redirect()->route('admin.dashboard');
+            }
+
+            if ($user->fighter) {
                 return redirect()->route('fighters.my-character');
             }
 

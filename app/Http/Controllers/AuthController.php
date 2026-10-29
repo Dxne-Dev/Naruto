@@ -37,6 +37,13 @@ class AuthController extends Controller
 
         if ($attempt) {
             $request->session()->regenerate();
+            $user = Auth::user();
+
+            // Redirection prioritaire pour l'administrateur
+            if ($user && $user->isAdmin()) {
+                return redirect()->intended(route('admin.dashboard'))
+                    ->with('success', 'Bienvenue dans le Poste de Commandement, Grand Maître.');
+            }
 
             return redirect()->intended(route('dashboard'))
                 ->with('success', 'Ravi de te revoir dans l\'arène !');

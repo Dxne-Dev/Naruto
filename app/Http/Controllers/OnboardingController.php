@@ -23,6 +23,11 @@ class OnboardingController extends Controller
     {
         $user = auth()->user();
 
+        // L'administrateur n'a pas à passer par l'onboarding joueur
+        if ($user && $user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        }
+
         // If user already has a fighter, go to character view
         if ($user->fighter) {
             return redirect()->route('fighters.my-character');
