@@ -60,6 +60,8 @@ return [
             'strict' => true,
             'engine' => 'InnoDB',
             'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::ATTR_TIMEOUT => 15,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 Mysql::ATTR_SSL_CA => (env('MYSQL_ATTR_SSL_CA') && file_exists(env('MYSQL_ATTR_SSL_CA')))
                     ? env('MYSQL_ATTR_SSL_CA')
                     : (file_exists('/etc/ssl/certs/ca-certificates.crt') ? '/etc/ssl/certs/ca-certificates.crt' : null),
