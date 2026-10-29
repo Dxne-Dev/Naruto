@@ -76,7 +76,7 @@
                         {{ $fighter->name }}
                     </h1>
                     <span class="font-mono text-[11px] text-shinobi-gold bg-shinobi-gold/10 px-2 py-0.5 rounded border border-shinobi-gold/30">
-                        Spécialisation {{ $fighter->specialization }}
+                        {{ $fighter->specialization_label }}
                     </span>
                 </div>
             </div>

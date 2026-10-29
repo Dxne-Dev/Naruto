@@ -101,7 +101,7 @@
                                         </div>
                                         <div class="font-monospace text-muted small">
                                             <span>Affinité : <strong>{{ $fighter->primary_element }}</strong></span>
-                                            <span class="text-muted">&bull; {{ $fighter->specialization }}</span>
+                                            <span class="text-dark fw-bold">&bull; {{ $fighter->specialization_label }}</span>
                                         </div>
                                         <div class="text-muted" style="font-size: 11px;">
                                             Commandé le : {{ $fighter->portrait_ordered_at?->format('d/m/Y H:i') ?? 'N/A' }}

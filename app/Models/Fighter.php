@@ -209,6 +209,30 @@ class Fighter extends Model
     }
 
     /**
+     * Get the human-friendly display label for fighter specialization.
+     */
+    public function getSpecializationLabelAttribute(): string
+    {
+        if ($this->specialization === 'Hiden') {
+            $clan = $this->clan;
+            $hidenDetails = [
+                'Aburame' => 'Hiden : Insectes Kikaichū',
+                'Nara' => 'Hiden : Manipulation des Ombres',
+                'Akimichi' => 'Hiden : Décuplement Corporel',
+                'Yamanaka' => 'Hiden : Transposition Sensorielle',
+                'Inuzuka' => 'Hiden : Maîtrise Canine (Ninken)',
+                'Senju' => 'Hiden : Mokuton Végétal',
+                'Hyūga' => 'Hiden : Jūken & Tenketsu',
+                'Uchiha' => 'Hiden : Dojutsu Sharingan',
+            ];
+
+            return $hidenDetails[$clan] ?? "Hiden : Arcanes du Clan {$clan}";
+        }
+
+        return $this->specialization ?? 'Ninjutsu';
+    }
+
+    /**
      * Snapshot representation for battle engine.
      *
      * @return array<string, mixed>
