@@ -36,7 +36,7 @@ return [
     ],
 
     'chariow' => [
-        'product_url' => env('CHARIOW_PRODUCT_URL', 'https://chariow.com'),
+        'product_url' => env('CHARIOW_PRODUCT_URL', 'https://cxhbwzeo.mychariow.shop/prd_2oz6tqtu/checkout'),
         'webhook_secret' => env('CHARIOW_WEBHOOK_SECRET', null),
     ],
 
