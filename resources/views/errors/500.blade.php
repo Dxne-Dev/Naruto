@@ -8,76 +8,83 @@
     .font-brush {
         font-family: 'Permanent Marker', 'Sedgwick Ave Display', cursive, sans-serif;
     }
+    .text-shadow-chakra {
+        text-shadow: 0 0 35px rgba(56, 226, 246, 0.7), 0 0 70px rgba(56, 226, 246, 0.4);
+    }
 </style>
 @endpush
 
 @section('content')
 <div class="relative w-full min-h-[calc(100vh-4rem)] flex items-center bg-[#0E0D0F] overflow-hidden">
-    {{-- Image d'arrière-plan 16:9 cinématographique officielle (Kakashi) --}}
+    {{-- Image d'arrière-plan 16:9 officielle Kakashi --}}
     <div class="absolute inset-0 z-0 pointer-events-none">
         <img src="{{ asset('images/errors/500-kakashi.jpg') }}" 
-             alt="Kakashi Hatake - Fond 500" 
+             alt="Kakashi Hatake - 500" 
              class="w-full h-full object-cover object-center">
-        {{-- Dégradé sombre bleuté sur la gauche pour détacher le texte --}}
-        <div class="absolute inset-0 bg-gradient-to-r from-[#0E0D0F]/90 via-[#0E0D0F]/50 to-transparent w-full md:w-1/2"></div>
+        {{-- Dégradé sombre pour détacher le texte à gauche --}}
+        <div class="absolute inset-0 bg-gradient-to-r from-[#0E0D0F]/95 via-[#0E0D0F]/65 to-transparent w-full md:w-3/5"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#0E0D0F] via-transparent to-[#0E0D0F]/30"></div>
     </div>
 
-    {{-- Calligraphie japonaise verticale à droite (はたけ カカシ) --}}
-    <div class="hidden lg:flex flex-col items-center absolute right-8 sm:right-14 top-1/2 -translate-y-1/2 z-10 select-none pointer-events-none opacity-80">
-        <span class="text-xs sm:text-sm font-mono tracking-widest text-slate-300 [writing-mode:vertical-rl] mb-4">
+    {{-- Calligraphie japonaise : masquée sur mobile, positionnée à droite du personnage et légèrement vers le bas --}}
+    <div class="hidden md:flex flex-col items-center absolute right-6 lg:right-10 bottom-12 lg:bottom-16 z-20 select-none pointer-events-none">
+        <span class="text-sm lg:text-base font-mono tracking-widest text-slate-200 [writing-mode:vertical-rl] mb-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] font-semibold">
             はたけ カカシ
         </span>
-        <div class="w-7 h-7 rounded-full border border-cyan-500/70 bg-black/60 flex items-center justify-center p-1 shadow-lg shadow-cyan-900/40">
-            <i class="bi bi-fan text-cyan-400 text-xs"></i>
+        <div class="w-8 h-8 rounded-full border border-[#38E2F6] bg-[#0E0D0F]/90 flex items-center justify-center p-1 shadow-[0_0_15px_rgba(56,226,246,0.5)]">
+            <i class="bi bi-fan text-[#38E2F6] text-xs"></i>
         </div>
     </div>
 
-    {{-- Bloc de contenu gauche fidèle au modèle --}}
-    <div class="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-10 sm:py-16 w-full">
-        <div class="max-w-xl">
+    {{-- Bloc de contenu gauche --}}
+    <div class="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-12 sm:py-20 w-full">
+        <div class="max-w-2xl">
             
-            {{-- Grand code d'erreur 500 en police Brush Shonen Blanche/Chakra --}}
-            <div class="font-brush text-7xl sm:text-9xl md:text-[9.5rem] leading-none text-white drop-shadow-[0_4px_30px_rgba(56,226,246,0.6)] select-none italic tracking-normal">
+            {{-- Code d'erreur géant 500 en blanc avec aura chakra électrique --}}
+            <div class="font-brush text-8xl sm:text-[11rem] md:text-[13rem] lg:text-[14rem] leading-none text-white text-shadow-chakra select-none italic tracking-tight"
+                 style="color: #FFFFFF;">
                 500
             </div>
 
-            {{-- Titre juste dessous en Brush blanc --}}
-            <h1 class="font-brush text-2xl sm:text-3xl md:text-4xl text-white tracking-wider uppercase mt-1 drop-shadow-[0_2px_15px_rgba(255,255,255,0.4)]">
+            {{-- Titre juste dessous en blanc --}}
+            <h1 class="font-brush text-2xl sm:text-4xl md:text-5xl text-white tracking-wider uppercase mt-1 drop-shadow-[0_4px_20px_rgba(56,226,246,0.5)]"
+                style="color: #FFFFFF;">
                 INTERNAL SERVER ERROR
             </h1>
 
             {{-- Phrase d'accroche --}}
-            <h2 class="mt-4 font-sans font-bold text-base sm:text-lg text-white">
+            <h2 class="mt-5 font-sans font-extrabold text-lg sm:text-xl md:text-2xl text-white drop-shadow">
                 Oups ! Quelque chose s'est mal passé...
             </h2>
 
             {{-- Explication --}}
-            <p class="mt-1.5 text-xs sm:text-sm text-slate-300 font-sans leading-relaxed max-w-md">
+            <p class="mt-2 text-sm sm:text-base text-slate-300 font-sans leading-relaxed max-w-lg">
                 Notre équipe est déjà sur le coup pour régler le problème.<br class="hidden sm:inline">
                 Merci de ta patience, shinobi !
             </p>
 
             {{-- Boutons d'action empilés --}}
-            <div class="mt-7 flex flex-col items-start gap-3 w-full sm:w-auto">
+            <div class="mt-8 flex flex-col items-start gap-3.5 w-full sm:w-auto">
                 <button onclick="window.location.reload()" 
-                        class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-sans font-bold text-xs uppercase tracking-wider bg-[#E50914] hover:bg-red-700 text-white shadow-lg shadow-red-900/40 transition-all hover:scale-105 active:scale-95 cursor-pointer">
-                    <i class="bi bi-arrow-clockwise text-sm"></i>
+                        class="inline-flex items-center justify-center gap-2.5 px-8 py-3 rounded-full font-sans font-bold text-sm tracking-wide text-white border border-[#ff3b47] shadow-[0_4px_20px_rgba(229,9,20,0.5)] transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                        style="background-color: #E50914;">
+                    <i class="bi bi-arrow-clockwise text-base"></i>
                     <span>Réessayer</span>
                 </button>
 
                 <a href="{{ auth()->check() ? route('fighters.my-character') : route('dashboard') }}" 
-                   class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-sans font-semibold text-xs tracking-wider bg-black/60 hover:bg-white/10 text-slate-200 border border-slate-600/70 hover:border-slate-400 transition-all hover:scale-105 active:scale-95">
-                    <i class="bi bi-house-door-fill text-sm"></i>
+                   class="inline-flex items-center justify-center gap-2.5 px-8 py-3 rounded-full font-sans font-semibold text-sm tracking-wide bg-black/75 hover:bg-white/10 text-slate-100 border border-slate-600 hover:border-slate-300 transition-all hover:scale-105 active:scale-95 backdrop-blur-sm">
+                    <i class="bi bi-house-door-fill text-base"></i>
                     <span>Retour à l'accueil</span>
                 </a>
             </div>
 
             {{-- Citation en bas --}}
-            <div class="mt-10 max-w-md">
-                <p class="italic text-[11px] sm:text-xs text-slate-400 font-sans leading-relaxed">
+            <div class="mt-12 max-w-lg">
+                <p class="italic text-xs sm:text-sm text-slate-400 font-sans leading-relaxed">
                     « Même dans l'obscurité la plus totale, le shinobi continue d'avancer. »
                 </p>
-                <span class="block mt-1 text-[10px] font-sans font-semibold text-slate-400">
+                <span class="block mt-1 text-xs font-sans font-semibold text-slate-400">
                     — Kakashi Hatake
                 </span>
             </div>
