@@ -157,6 +157,12 @@
                             <span class="bg-shinobi-dark/90 border border-shinobi-border/80 px-2.5 py-1 rounded text-[10px] font-bold text-white shadow">
                                 {{ $fighter->xp }} / {{ $xpTarget }} XP
                             </span>
+                            @if(empty($fighter->source_photo_path))
+                                <button type="button" @click="$refs.uploadPortraitModal.classList.remove('hidden')" class="bg-shinobi-gold text-slate-950 font-bold px-2 py-1 rounded text-[10px] shadow flex items-center gap-1 hover:brightness-110">
+                                    <i class="bi bi-camera-fill"></i>
+                                    <span>Ajouter ma photo</span>
+                                </button>
+                            @endif
                         </div>
                     @endif
                 </div>
@@ -597,6 +603,33 @@
                     Fermer
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Modale Ajout de Photo pour Portrait HD -->
+    <div x-ref="uploadPortraitModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="relative w-full max-w-md rounded-3xl border border-shinobi-gold/60 bg-gradient-to-b from-[#1C1822] via-shinobi-card to-[#120F15] p-6 sm:p-8 shadow-2xl text-center space-y-4">
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-shinobi-gold/20 border border-shinobi-gold/50 flex items-center justify-center text-shinobi-gold text-2xl">
+                <i class="bi bi-camera-fill"></i>
+            </div>
+            <h3 class="font-serif text-2xl font-black text-white uppercase">Importer ma Photo</h3>
+            <p class="font-sans text-xs text-slate-300 leading-relaxed">
+                Téléverse ta photo pour que les Maîtres Artisans forgent ton portrait officiel Shinobi HD dès confirmation de ton Pass.
+            </p>
+            <form method="POST" action="{{ route('payment.upload-photo') }}" enctype="multipart/form-data" class="space-y-4 pt-2">
+                @csrf
+                <input type="file" name="source_photo_file" accept="image/*" required class="w-full text-xs font-mono text-slate-300 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-mono file:font-bold file:bg-shinobi-gold file:text-slate-950 hover:file:brightness-110">
+                <div class="flex items-center justify-center gap-3 pt-2">
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-shinobi-gold hover:brightness-110 text-slate-950 font-mono text-xs font-black uppercase tracking-wider transition">
+                        Enregistrer
+                    </button>
+                    <button type="button" @click="$refs.uploadPortraitModal.classList.add('hidden')" class="px-5 py-2.5 rounded-xl border border-shinobi-border bg-white/5 hover:bg-white/10 text-slate-300 font-mono text-xs uppercase transition">
+                        Annuler
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
         </div>
     </div>

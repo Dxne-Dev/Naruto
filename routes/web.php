@@ -89,6 +89,7 @@ Route::middleware('auth')->group(function () {
     // Micro-Transaction & Pass Illimité (700 FCFA via Chariow / Mobile Money)
     Route::get('/checkout/pass', [PaymentController::class, 'checkout'])->name('payment.checkout');
     Route::post('/checkout/process', [PaymentController::class, 'process'])->name('payment.process');
+    Route::post('/checkout/upload-photo', [PaymentController::class, 'uploadPhoto'])->name('payment.upload-photo');
     Route::post('/checkout/notify-ack/{passRequest}', [PaymentController::class, 'acknowledgeNotification'])->name('payment.ack-notification');
     Route::get('/checkout/success', [PaymentController::class, 'success'])->name('payment.success');
     Route::post('/checkout/webhook', [PaymentController::class, 'webhook'])->name('payment.webhook');

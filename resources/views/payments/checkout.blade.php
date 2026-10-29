@@ -216,6 +216,46 @@
                         </div>
                     </div>
 
+                    <!-- ALERTE PHOTO MANQUANTE SI NON TÉLÉVERSÉE -->
+                    @if($user->fighter && empty($user->fighter->source_photo_path))
+                        <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 mb-6 space-y-3">
+                            <div class="flex items-center gap-2 text-amber-300 font-mono text-xs font-bold uppercase">
+                                <i class="bi bi-camera-fill text-base"></i>
+                                <span>Photo de ton Shinobi requise pour le portrait HD</span>
+                            </div>
+                            <p class="font-sans text-xs text-slate-300 leading-relaxed">
+                                Tu n'avais pas fourni de photo lors de ton inscription. Téléverse ta photo dès maintenant pour que l'administration forge ton portrait officiel après validation.
+                            </p>
+                            <form method="POST" action="{{ route('payment.upload-photo') }}" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
+                                @csrf
+                                <input type="file" name="source_photo_file" accept="image/*" required class="w-full text-xs font-mono text-slate-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-mono file:font-bold file:bg-white/10 file:text-white hover:file:bg-white/20">
+                                <button type="submit" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-mono text-xs font-black uppercase tracking-wider shrink-0 transition">
+                                    Enregistrer la photo
+                                </button>
+                            </form>
+                        </div>
+                    @elseif($user->fighter && !empty($user->fighter->source_photo_path))
+                        <div class="p-3.5 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 mb-6 flex items-center justify-between gap-3 text-xs font-mono text-emerald-300">
+                            <div class="flex items-center gap-2.5">
+                                <i class="bi bi-check-circle-fill text-emerald-400 text-base"></i>
+                                <span>Photo enregistrée pour la gravure HD</span>
+                            </div>
+                            <button type="button" @click="$refs.changePhotoForm.classList.toggle('hidden')" class="text-[11px] text-slate-400 hover:text-white underline">
+                                Changer
+                            </button>
+                        </div>
+                        <form x-ref="changePhotoForm" method="POST" action="{{ route('payment.upload-photo') }}" enctype="multipart/form-data" class="hidden p-4 rounded-2xl bg-shinobi-dark border border-shinobi-border mb-6 space-y-2">
+                            @csrf
+                            <span class="block font-mono text-xs text-slate-300">Nouvelle photo pour la forge du portrait :</span>
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                <input type="file" name="source_photo_file" accept="image/*" required class="w-full text-xs font-mono text-slate-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-mono file:font-bold file:bg-white/10 file:text-white">
+                                <button type="submit" class="px-4 py-2 rounded-xl bg-shinobi-red hover:bg-shinobi-red-hover text-white font-mono text-xs font-bold uppercase shrink-0 transition">
+                                    Mettre à jour
+                                </button>
+                            </div>
+                        </form>
+                    @endif
+
                     <!-- MAIN CTA BUTTON: Redirect to Payment Window -->
                     <a href="{{ $chariowUrl }}" target="_blank" rel="noopener noreferrer" class="group relative w-full flex items-center justify-center gap-3 py-4 sm:py-5 px-6 rounded-xl font-mono font-black text-sm sm:text-base text-white uppercase tracking-wider bg-gradient-to-r from-shinobi-red via-red-600 to-rose-700 hover:from-shinobi-red-hover hover:to-rose-800 shadow-[0_10px_30px_rgba(229,9,20,0.45)] hover:shadow-[0_15px_40px_rgba(229,9,20,0.65)] hover:-translate-y-0.5 transition-all duration-200 text-decoration-none">
                         <i class="bi bi-fire text-lg group-hover:scale-110 transition-transform"></i>
@@ -270,7 +310,7 @@
                                 </p>
                             </div>
                         @else
-                            <form method="POST" action="{{ route('payment.process') }}" id="checkout-form" class="space-y-4">
+                            <form method="POST" action="{{ route('payment.process') }}" id="checkout-form" enctype="multipart/form-data" class="space-y-4">
                                 @csrf
 
                                 <div>
@@ -328,6 +368,16 @@
                                     <input type="text" name="transaction_reference" id="transaction_reference" class="w-full px-4 py-2.5 rounded-xl bg-shinobi-dark border border-shinobi-border focus:border-shinobi-red focus:ring-1 focus:ring-shinobi-red text-slate-100 text-sm font-mono placeholder-slate-500" placeholder="Ex: TXN_123456, Référence SMS opérateur...">
                                     <span class="text-[10px] font-mono text-slate-400 mt-1 block">Accélère la vérification par l'équipe d'arbitrage.</span>
                                 </div>
+
+                                <!-- Photo optionnelle si non encore transmise -->
+                                @if($user->fighter && empty($user->fighter->source_photo_path))
+                                    <div>
+                                        <label for="source_photo_file_process" class="block text-xs font-mono font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                                            Photo de ton combattant <span class="text-shinobi-gold font-normal lowercase">(pour forge du portrait HD)</span>
+                                        </label>
+                                        <input type="file" name="source_photo_file" id="source_photo_file_process" accept="image/*" class="w-full text-xs font-mono text-slate-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-mono file:font-bold file:bg-white/10 file:text-white hover:file:bg-white/20">
+                                    </div>
+                                @endif
 
                                 <button type="submit" class="w-full py-3.5 px-4 rounded-xl font-mono font-bold text-xs uppercase tracking-wider bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all flex items-center justify-center gap-2">
                                     <i class="bi bi-send-fill text-xs"></i>

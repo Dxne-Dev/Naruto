@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\ImageGeneration\ShinobiImageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class PaymentController extends Controller
@@ -93,6 +94,7 @@ class PaymentController extends Controller
             'phone_or_card' => ['required', 'string', 'max:50'],
             'transaction_reference' => ['nullable', 'string', 'max:100'],
             'user_note' => ['nullable', 'string', 'max:500'],
+            'source_photo_file' => ['nullable', 'image', 'max:6144'],
         ], [
             'payment_method.required' => 'Veuillez sélectionner le mode de paiement utilisé.',
             'phone_or_card.required' => 'Veuillez indiquer le numéro de téléphone ou de carte utilisé.',
@@ -108,8 +110,45 @@ class PaymentController extends Controller
             'user_notified' => false,
         ]);
 
+        // Si l'utilisateur a attaché sa photo de combattant lors de la demande
+        if ($request->hasFile('source_photo_file') && $user->fighter) {
+            $path = $request->file('source_photo_file')->store('source_photos', 'public');
+            $user->fighter->update([
+                'source_photo_path' => Storage::url($path),
+            ]);
+        }
+
         return redirect()->route('payment.checkout')
             ->with('success', 'Ta demande de vérification a été transmise aux Grands Maîtres de l\'Arène. Dès confirmation de ton paiement, ton pass sera activé et tu seras immédiatement notifié !');
+    }
+
+    /**
+     * Upload or update fighter source photo for pass activation and portrait forging.
+     */
+    public function uploadPhoto(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $fighter = $user->fighter;
+
+        if (! $fighter) {
+            return back()->with('error', 'Aucun combattant assigné à ton compte.');
+        }
+
+        $request->validate([
+            'source_photo_file' => ['required', 'image', 'max:6144'],
+        ], [
+            'source_photo_file.required' => 'Veuillez sélectionner une image.',
+            'source_photo_file.image' => 'Le fichier doit être une image valide (JPG, PNG, WebP).',
+            'source_photo_file.max' => 'L\'image ne doit pas dépasser 6 Mo.',
+        ]);
+
+        $path = $request->file('source_photo_file')->store('source_photos', 'public');
+        $fighter->update([
+            'source_photo_path' => Storage::url($path),
+            'portrait_status' => $user->has_paid_microtransaction ? 'pending' : $fighter->portrait_status,
+        ]);
+
+        return back()->with('success', 'Ta photo a été enregistrée avec succès ! Les Maîtres Artisans l\'utiliseront pour forger ton portrait officiel.');
     }
 
     /**
