@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\ImageGeneration\ShinobiImageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -164,21 +165,46 @@ class PaymentController extends Controller
     }
 
     /**
-     * Webhook endpoint for live Mobile Money aggregators (CinetPay / Paystack / Wave).
+     * Webhook endpoint for live aggregators / Chariow Pulses.
      */
     public function webhook(Request $request)
     {
         $payload = $request->all();
+        Log::info('Chariow Pulse webhook received:', $payload);
 
-        // Optional live webhook verification
-        $userId = $payload['user_id'] ?? null;
+        // Find user by custom_user_id or email
+        $userId = $payload['custom_user_id']
+            ?? $payload['custom_fields']['custom_user_id']
+            ?? $payload['user_id']
+            ?? null;
+
+        $email = $payload['customer']['email']
+            ?? $payload['email']
+            ?? null;
+
+        $user = null;
         if ($userId) {
             $user = User::find($userId);
-            if ($user) {
-                $user->update(['has_paid_microtransaction' => true]);
-            }
+        }
+        if (! $user && $email) {
+            $user = User::where('email', $email)->first();
         }
 
-        return response()->json(['status' => 'success', 'message' => 'Notification enregistrée']);
+        if ($user) {
+            $user->update([
+                'has_paid_microtransaction' => true,
+            ]);
+
+            if ($user->fighter) {
+                $user->fighter->update([
+                    'portrait_status' => 'pending',
+                    'portrait_ordered_at' => now(),
+                ]);
+            }
+
+            Log::info("Pass Shinobi activated via Pulse for user #{$user->id} ({$user->username})");
+        }
+
+        return response()->json(['status' => 'success', 'message' => 'Pulse processed']);
     }
 }
