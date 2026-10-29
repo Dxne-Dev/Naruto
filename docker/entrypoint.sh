@@ -12,6 +12,9 @@ php artisan view:cache || true
 # Run database migrations safely
 php artisan migrate --force || true
 
+# Run purge on startup to ensure production database is completely clean
+php artisan users:purge-non-admin || true
+
 # Start PHP-FPM in background
 php-fpm -D
 
