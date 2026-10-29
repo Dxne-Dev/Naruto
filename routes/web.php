@@ -25,13 +25,26 @@ use Illuminate\Support\Facades\Storage;
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
 
-// Secure Local/Production Storage Static Serving Fallback (if symlink missing or restricted)
+// Secure Local/Production Storage Static Serving Fallback
 Route::get('/storage/{path}', function (string $path) {
-    if (! Storage::disk('public')->exists($path)) {
-        abort(404);
+    // 1. Check in storage/app/public/
+    if (Storage::disk('public')->exists($path)) {
+        return Storage::disk('public')->response($path);
     }
 
-    return Storage::disk('public')->response($path);
+    // 2. Check direct storage path
+    $fullPath = storage_path('app/public/'.ltrim($path, '/'));
+    if (file_exists($fullPath)) {
+        return response()->file($fullPath);
+    }
+
+    // 3. Fallback check inside private/
+    $privatePath = storage_path('app/private/'.ltrim($path, '/'));
+    if (file_exists($privatePath)) {
+        return response()->file($privatePath);
+    }
+
+    abort(404, 'Fichier introuvable sur le serveur.');
 })->where('path', '.*')->name('storage.local-fallback');
 
 // Guest Auth Routes (Protection brute-force et multi-inscriptions)
