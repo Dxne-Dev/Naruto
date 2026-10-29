@@ -18,6 +18,35 @@ class IpTournamentQuota extends Model
     ];
 
     /**
+     * Whitelisted IPs and device fingerprints (bypass limits and anti-cheat checks).
+     */
+    public const WHITELISTED_IPS = [
+        '127.0.0.1',
+        '::1',
+        '137.255.75.199',
+    ];
+
+    public const WHITELISTED_FINGERPRINTS = [
+        'a4592d92a73ff74d99b6719b27ee0d4199a333e7ef9c76a429295ef7e5b505fc',
+    ];
+
+    /**
+     * Check if an IP or fingerprint is whitelisted.
+     */
+    public static function isWhitelisted(?string $ip, ?string $fingerprint = null): bool
+    {
+        if ($ip && in_array(trim($ip), self::WHITELISTED_IPS, true)) {
+            return true;
+        }
+
+        if ($fingerprint && in_array(trim($fingerprint), self::WHITELISTED_FINGERPRINTS, true)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Generate a deterministic 64-char SHA-256 device fingerprint combining IP and User-Agent.
      */
     public static function generateFingerprint(?string $ip, ?string $userAgent): string
@@ -69,6 +98,11 @@ class IpTournamentQuota extends Model
         }
 
         $fingerprint = static::generateFingerprint($ip, $userAgent);
+
+        // Bypass for whitelisted developer/admin IP or fingerprint
+        if (static::isWhitelisted($ip, $fingerprint)) {
+            return false;
+        }
 
         // 1. Primary check by device fingerprint (combining IP + User-Agent)
         $record = static::where('device_fingerprint', $fingerprint)->first();

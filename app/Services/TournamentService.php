@@ -54,7 +54,8 @@ class TournamentService
         $fingerprint = $deviceFingerprint ?? ($registrationIp || $userAgent ? IpTournamentQuota::generateFingerprint($registrationIp, $userAgent) : null);
 
         // Anti-triche Salons Privés : Empêcher deux combattants partageant le même appareil (device fingerprint) d'entrer dans le même salon
-        if ($tournament->is_private && $fingerprint) {
+        // Sauf si l'IP ou l'empreinte est whitelistée pour les tests/développeurs
+        if ($tournament->is_private && $fingerprint && ! IpTournamentQuota::isWhitelisted($registrationIp, $fingerprint)) {
             $duplicateDeviceInRoom = $tournament->entries()
                 ->where('device_fingerprint', $fingerprint)
                 ->where('fighter_id', '!=', $fighter->id)
