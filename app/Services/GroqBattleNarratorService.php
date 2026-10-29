@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Log;
 
 class GroqBattleNarratorService
 {
+    public function __construct(
+        protected BattleNarratorService $fallbackNarrator
+    ) {}
+
     /**
      * Generate or retrieve cached AI play-by-play commentary for a battle.
      */
@@ -21,7 +25,7 @@ class GroqBattleNarratorService
         // 2. Only generate AI commentary if at least one human player is involved (Player vs Bot or Player vs Player)
         // Bot vs Bot matches do not call the AI API to save resources.
         if (! $battle->involvesHumanPlayer()) {
-            return '';
+            return $this->generateFallbackCommentary($battle);
         }
 
         // 3. Build prompt from battle facts and combat logs
@@ -33,7 +37,48 @@ class GroqBattleNarratorService
             return $commentary;
         }
 
+        // Fallback en cas d'échec / timeout / crash / rate limit de l'API IA
+        $fallback = $this->generateFallbackCommentary($battle);
+        if (! empty($fallback)) {
+            $battle->update(['ai_commentary' => $fallback]);
+
+            return $fallback;
+        }
+
         return '';
+    }
+
+    /**
+     * Generate structured fallback commentary using the deterministic BattleNarratorService.
+     */
+    public function generateFallbackCommentary(Battle $battle): string
+    {
+        $battle->loadMissing(['fighterA', 'fighterB', 'winner', 'match.tournament', 'logs.attacker']);
+
+        $fA = $battle->fighterA;
+        $fB = $battle->fighterB;
+        $winner = $battle->winner;
+
+        if (! $fA || ! $fB) {
+            return '';
+        }
+
+        $narratives = $this->fallbackNarrator->buildNarrativeRounds($battle->logs, $fA, $fB);
+
+        $out = "# 🎙️ CHRONIQUE DUEL D'ARÈNE : {$fA->name} VS {$fB->name}\n\n";
+        $out .= "Au signal officiel de l'Examen Chūnin, {$fA->name} du clan {$fA->clan} (Village de {$fA->village}) affronte {$fB->name} du clan {$fB->clan} (Village de {$fB->village}) dans un affrontement d'exception !\n\n";
+
+        foreach ($narratives as $item) {
+            $rNum = $item['round_number'];
+            $summary = $item['summary'];
+            $out .= "## 🔴 TOUR {$rNum}\n{$summary}\n\n";
+        }
+
+        if ($winner) {
+            $out .= "## 🏆 VERDICT FINAL\nCombat terminé avec panache ! {$winner->name} s'impose après {$battle->rounds_count} rounds intenses et décroche la victoire !";
+        }
+
+        return trim($out);
     }
 
     /**
@@ -42,10 +87,10 @@ class GroqBattleNarratorService
     public function generateWithGroq(Battle $battle): string
     {
         $apiKey = config('services.groq.api_key');
-        $model = config('services.groq.model', 'openai/gpt-oss-120b');
+        $model = config('services.groq.model', 'llama-3.3-70b-versatile');
 
         if (empty($apiKey)) {
-            Log::warning('GROQ_API_KEY is missing. Skipping AI battle commentary generation.');
+            Log::warning('GROQ_API_KEY is missing. Falling back to local narrative generation.');
 
             return '';
         }
@@ -57,7 +102,8 @@ class GroqBattleNarratorService
         try {
             $response = Http::withToken($apiKey)
                 ->withoutVerifying()
-                ->timeout(35)
+                ->timeout(12)
+                ->retry(2, 250, throw: false)
                 ->post('https://api.groq.com/openai/v1/chat/completions', [
                     'model' => $model,
                     'messages' => [
@@ -71,7 +117,7 @@ class GroqBattleNarratorService
                         ],
                     ],
                     'temperature' => 0.7,
-                    'max_tokens' => 2500,
+                    'max_tokens' => 2000,
                 ]);
 
             if ($response->successful()) {
