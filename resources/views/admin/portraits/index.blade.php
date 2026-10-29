@@ -13,7 +13,7 @@
                         <span class="badge bg-danger-subtle text-danger font-monospace px-3 py-1 mb-2">FORGE DES PORTRAITS &bull; MAGICIEN D'OZ</span>
                         <h2 class="fw-bold mb-1" style="letter-spacing: -0.02em;">Portraits Officiels Commandés</h2>
                         <p class="text-muted mb-0 small">
-                            Génère les portraits sur ChatGPT/DALL-E avec le prompt dynamique et téléverse le fichier pour l'injecter sur la carte du joueur.
+                            Tableau de commande des portraits : copie le prompt en 1 clic, génère l'illustration sur ChatGPT et téléverse le fichier pour l'injecter sur la carte du joueur.
                         </p>
                     </div>
                     <div class="d-flex gap-2">
@@ -37,103 +37,140 @@
         </div>
     @endif
 
-    <!-- Portraits Orders List -->
+    <!-- Data Table Card -->
     <div class="row">
         <div class="col-12">
-            @forelse($fighters as $fighter)
-                <div class="card card-kpi-custom mb-4 bg-white border-0 shadow-sm overflow-hidden">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge {{ $fighter->portrait_status === 'pending' ? 'bg-warning text-dark' : 'bg-success' }}">
-                                {{ $fighter->portrait_status === 'pending' ? 'EN ATTENTE DE FORGE' : 'LIVRÉ & PUBLIÉ' }}
-                            </span>
-                            <strong class="fs-6">{{ $fighter->name }}</strong>
-                            <span class="text-muted small">&bull; Joueur : {{ $fighter->user?->name }} ({{ $fighter->user?->email }})</span>
-                        </div>
-                        <div class="text-muted font-monospace small">
-                            Commandé le : {{ $fighter->portrait_ordered_at?->format('d/m/Y H:i') ?? 'N/A' }}
-                        </div>
-                    </div>
+            <div class="card bg-white border-0 shadow-sm overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light font-monospace small text-uppercase">
+                            <tr>
+                                <th class="ps-4" style="width: 70px;">ID</th>
+                                <th style="width: 110px;">Photo Source</th>
+                                <th>Combattant & Joueur</th>
+                                <th>Détails Shinobi</th>
+                                <th style="width: 140px;">Prompt IA</th>
+                                <th>Statut</th>
+                                <th class="text-end pe-4" style="min-width: 240px;">Action / Téléverser</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($fighters as $fighter)
+                                <tr>
+                                    <!-- ID -->
+                                    <td class="ps-4 font-monospace text-muted small">
+                                        #{{ $fighter->id }}
+                                    </td>
 
-                    <div class="card-body p-4">
-                        <div class="row g-4 align-items-center">
-                            <!-- Photo Source Utilisateur -->
-                            <div class="col-12 col-md-3 text-center">
-                                <span class="d-block text-muted font-monospace small mb-2 text-uppercase fw-bold">Photo Source Envoyée</span>
-                                @if($fighter->source_photo_path)
-                                    <div class="position-relative mx-auto rounded-3 overflow-hidden border shadow-sm" style="max-width: 180px; height: 180px; background: #000;">
-                                        <img src="{{ $fighter->source_photo_url }}" alt="Photo Source de {{ $fighter->name }}" class="w-100 h-100 object-fit-cover">
-                                    </div>
-                                    <a href="{{ route('admin.portraits.download-source', $fighter) }}" class="btn btn-sm btn-outline-dark mt-2 font-monospace" style="font-size: 11px;">
-                                        <i class="bi bi-download me-1"></i> Télécharger Photo
-                                    </a>
-                                @else
-                                    <div class="p-4 bg-light rounded text-muted font-monospace small">
-                                        Pas de photo personnalisée (Avatar par défaut)
-                                    </div>
-                                @endif
-                            </div>
+                                    <!-- Photo Source Envoyée -->
+                                    <td>
+                                        @if($fighter->source_photo_path)
+                                            <div class="position-relative rounded-3 overflow-hidden border shadow-sm" style="width: 72px; height: 72px; background: #0E0D0F;">
+                                                <img src="{{ $fighter->source_photo_url }}" alt="Photo Source" class="w-100 h-100 object-fit-cover">
+                                            </div>
+                                            <a href="{{ route('admin.portraits.download-source', $fighter) }}" class="btn btn-xs btn-outline-dark mt-1 font-monospace py-0 px-1 text-nowrap" style="font-size: 10px;">
+                                                <i class="bi bi-download me-0.5"></i> Télécharger
+                                            </a>
+                                        @else
+                                            <span class="badge bg-light text-muted border font-monospace text-wrap" style="font-size: 10px; max-width: 80px;">
+                                                Sans photo
+                                            </span>
+                                        @endif
+                                    </td>
 
-                            <!-- Le Prompt Dynamique Prêt pour ChatGPT -->
-                            <div class="col-12 col-md-5">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="text-muted font-monospace small text-uppercase fw-bold">Prompt IA Prêt pour ChatGPT / Muse</span>
-                                    <button type="button" class="btn btn-sm btn-outline-primary font-monospace py-1 px-2" style="font-size: 11px;" onclick="copyPrompt('prompt_{{ $fighter->id }}')">
-                                        <i class="bi bi-clipboard me-1"></i> Copier Prompt
-                                    </button>
-                                </div>
-                                <textarea id="prompt_{{ $fighter->id }}" class="form-control font-monospace small bg-light" rows="5" readonly style="font-size: 12px; resize: none;">{{ $fighter->generated_prompt }}</textarea>
-                                
-                                <div class="mt-2 text-muted font-monospace" style="font-size: 11px;">
-                                    <strong>Affiliation :</strong> {{ $fighter->village }} &bull; Clan {{ $fighter->clan }} &bull; <strong>Affinité :</strong> {{ $fighter->primary_element }}
-                                </div>
-                            </div>
+                                    <!-- Combattant & Joueur -->
+                                    <td>
+                                        <div class="fw-bold fs-6 text-dark">{{ $fighter->name }}</div>
+                                        <div class="text-muted small">
+                                            <i class="bi bi-person me-1"></i>{{ $fighter->user?->name ?? 'Anonyme' }}
+                                        </div>
+                                        <div class="font-monospace text-muted" style="font-size: 11px;">
+                                            {{ $fighter->user?->email }}
+                                        </div>
+                                    </td>
 
-                            <!-- Upload du Portrait Final par l'Admin -->
-                            <div class="col-12 col-md-4">
-                                <div class="p-3 bg-light rounded-3 border">
-                                    <span class="d-block text-dark font-monospace small mb-2 text-uppercase fw-bold">
-                                        {{ $fighter->portrait_status === 'pending' ? '1. Injecter le Portrait Généré' : 'Portrait Actuel en Ligne' }}
-                                    </span>
+                                    <!-- Détails Shinobi (Village, Clan, Élément) -->
+                                    <td>
+                                        <div class="d-flex flex-wrap gap-1 mb-1">
+                                            <span class="badge bg-danger-subtle text-danger font-monospace" style="font-size: 10px;">
+                                                Clan {{ $fighter->clan }}
+                                            </span>
+                                            <span class="badge bg-secondary-subtle text-secondary font-monospace" style="font-size: 10px;">
+                                                {{ $fighter->village }}
+                                            </span>
+                                        </div>
+                                        <div class="font-monospace text-muted small">
+                                            <span>Affinité : <strong>{{ $fighter->primary_element }}</strong></span>
+                                            <span class="text-muted">&bull; {{ $fighter->specialization }}</span>
+                                        </div>
+                                        <div class="text-muted" style="font-size: 11px;">
+                                            Commandé le : {{ $fighter->portrait_ordered_at?->format('d/m/Y H:i') ?? 'N/A' }}
+                                        </div>
+                                    </td>
 
-                                    @if($fighter->portrait_path)
-                                        <div class="d-flex align-items-center gap-3 mb-3">
-                                            <img src="{{ $fighter->portrait_path }}" alt="Portrait Final" class="rounded border shadow-sm" style="width: 70px; height: 70px; object-fit: cover;">
-                                            <div>
-                                                <span class="badge bg-success-subtle text-success mb-1">En ligne sur sa carte</span>
-                                                <a href="{{ route('fighters.show', $fighter) }}" target="_blank" class="d-block small text-primary text-decoration-none font-monospace">
-                                                    Voir sa carte Databook &rarr;
+                                    <!-- Colonne Prompt : Juste le bouton Copier dans le presse-papier -->
+                                    <td>
+                                        {{-- Stockage du prompt dans un textarea masqué --}}
+                                        <textarea id="prompt_text_{{ $fighter->id }}" class="d-none">{{ $fighter->generated_prompt }}</textarea>
+                                        <button type="button" 
+                                                id="btn_copy_{{ $fighter->id }}"
+                                                class="btn btn-sm btn-outline-primary font-monospace py-1.5 px-3 text-nowrap" 
+                                                style="font-size: 11px;" 
+                                                onclick="copyPrompt('{{ $fighter->id }}')">
+                                            <i class="bi bi-clipboard me-1"></i> Copier
+                                        </button>
+                                    </td>
+
+                                    <!-- Statut -->
+                                    <td>
+                                        @if($fighter->portrait_status === 'pending')
+                                            <span class="badge bg-warning text-dark font-monospace" style="font-size: 10px;">
+                                                <i class="bi bi-hourglass-split me-1"></i> En Attente
+                                            </span>
+                                        @else
+                                            <span class="badge bg-success font-monospace" style="font-size: 10px;">
+                                                <i class="bi bi-check2-circle me-1"></i> Livré
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    <!-- Colonne Action : Téléverser & Publier le portrait -->
+                                    <td class="text-end pe-4">
+                                        @if($fighter->portrait_path)
+                                            <div class="d-flex align-items-center justify-content-end gap-2 mb-2">
+                                                <img src="{{ $fighter->portrait_url }}" alt="Portrait Actuel" class="rounded border shadow-sm" style="width: 38px; height: 38px; object-fit: cover;">
+                                                <a href="{{ route('fighters.show', $fighter) }}" target="_blank" class="btn btn-xs btn-outline-secondary py-0 px-1 font-monospace" style="font-size: 10px;" title="Voir la carte du joueur">
+                                                    <i class="bi bi-box-arrow-up-right me-0.5"></i> Carte
                                                 </a>
                                             </div>
-                                        </div>
-                                    @endif
+                                        @endif
 
-                                    <form method="POST" action="{{ route('admin.portraits.upload', $fighter) }}" enctype="multipart/form-data">
-                                        @csrf
-                                        <div class="mb-2">
-                                            <input type="file" name="portrait_file" class="form-control form-control-sm" accept="image/*" required>
-                                        </div>
-                                        <button type="submit" class="btn btn-danger btn-sm w-100 font-monospace text-uppercase">
-                                            <i class="bi bi-cloud-arrow-up-fill me-1"></i> 
-                                            {{ $fighter->portrait_status === 'pending' ? 'Publier sur sa Carte Ninja' : 'Remplacer l\'image en ligne' }}
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                        <form method="POST" action="{{ route('admin.portraits.upload', $fighter) }}" enctype="multipart/form-data" class="d-flex align-items-center gap-1.5 justify-content-end">
+                                            @csrf
+                                            <input type="file" name="portrait_file" class="form-control form-control-sm" accept="image/*" required style="max-width: 160px; font-size: 11px;">
+                                            <button type="submit" class="btn btn-sm {{ $fighter->portrait_status === 'pending' ? 'btn-danger' : 'btn-outline-danger' }} font-monospace text-nowrap" style="font-size: 11px;">
+                                                <i class="bi bi-cloud-arrow-up-fill me-1"></i> {{ $fighter->portrait_status === 'pending' ? 'Publier' : 'Remplacer' }}
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="text-center py-5 text-muted font-monospace">
+                                        <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                                        Aucune commande de portrait trouvée pour ce filtre.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
-            @empty
-                <div class="card card-kpi-custom p-5 text-center bg-white border-0 shadow-sm">
-                    <div class="text-muted font-monospace py-4">
-                        <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
-                        Aucune commande de portrait trouvée pour ce filtre.
-                    </div>
-                </div>
-            @endforelse
 
-            <div class="d-flex justify-content-center mt-4">
-                {{ $fighters->appends(['status' => $currentStatus])->links() }}
+                @if($fighters->hasPages())
+                    <div class="card-footer bg-white py-3 d-flex justify-content-center border-0">
+                        {{ $fighters->appends(['status' => $currentStatus])->links() }}
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -141,11 +178,31 @@
 
 @push('scripts')
 <script>
-function copyPrompt(id) {
-    const textarea = document.getElementById(id);
+function copyPrompt(fighterId) {
+    const textarea = document.getElementById('prompt_text_' + fighterId);
+    const btn = document.getElementById('btn_copy_' + fighterId);
+    if (!textarea) return;
+
+    textarea.classList.remove('d-none');
     textarea.select();
-    navigator.clipboard.writeText(textarea.value);
-    alert('Prompt ninja copié dans le presse-papier ! Tu peux le coller directement dans ChatGPT avec la photo du joueur.');
+    textarea.setSelectionRange(0, 99999);
+
+    navigator.clipboard.writeText(textarea.value).then(() => {
+        textarea.classList.add('d-none');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-check-lg text-success me-1"></i> Copié !';
+        btn.classList.remove('btn-outline-primary');
+        btn.classList.add('btn-success', 'text-white');
+        setTimeout(() => {
+            btn.innerHTML = originalHtml;
+            btn.classList.remove('btn-success', 'text-white');
+            btn.classList.add('btn-outline-primary');
+        }, 2000);
+    }).catch(err => {
+        document.execCommand('copy');
+        textarea.classList.add('d-none');
+        alert('Prompt copié dans le presse-papier !');
+    });
 }
 </script>
 @endpush
