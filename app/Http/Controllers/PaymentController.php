@@ -55,20 +55,15 @@ class PaymentController extends Controller
     {
         $user = $request->user();
 
-        // Mark user pass as activated
-        $user->update([
-            'has_paid_microtransaction' => true,
-        ]);
-
-        if ($user->fighter) {
-            $user->fighter->update([
-                'portrait_status' => 'pending',
-                'portrait_ordered_at' => now(),
-            ]);
+        // Si le webhook Chariow Pulse a déjà validé le paiement
+        if ($user->has_paid_microtransaction) {
+            return redirect()->route('fighters.my-character')
+                ->with('success', 'Félicitations ! Ton paiement de 700 FCFA a été confirmé. Ton Pass Naruto est actif à vie et les Maîtres Artisans forgent actuellement ton portrait officiel HD !');
         }
 
-        return redirect()->route('fighters.my-character')
-            ->with('success', 'Félicitations ! Ton paiement de 700 FCFA a été confirmé. Ton Pass Naruto est actif à vie et les Maîtres Artisans forgent actuellement ton portrait officiel HD !');
+        // Sinon, le paiement est en cours de traitement / confirmation par la passerelle
+        return redirect()->route('payment.checkout')
+            ->with('info', 'Merci pour ton paiement ! La confirmation automatique par Chariow est en cours de synchronisation. Ton pass s\'activera dès la validation du paiement.');
     }
 
     /**
