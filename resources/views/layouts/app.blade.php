@@ -222,7 +222,7 @@
             </div>
         @endif
 
-        @if(request()->routeIs('dashboard', 'login', 'register'))
+        @if(request()->routeIs('dashboard', 'login', 'register', 'errors.*') || isset($isErrorPage) && $isErrorPage)
             @yield('content')
         @else
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
