@@ -270,6 +270,13 @@
                     Téléverse ta photo personnelle pour que l'Académie façonne ta carte de combattant officielle.
                 </p>
 
+                @if($user && $user->has_paid_microtransaction)
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold">
+                        <i class="bi bi-patch-check-fill text-emerald-400"></i>
+                        <span>PASS SHINOBI ILLIMITÉ ACTIF SUR TON COMPTE</span>
+                    </div>
+                @endif
+
                 <div class="max-w-md mx-auto p-6 rounded-2xl border-2 border-dashed border-shinobi-border bg-shinobi-dark/60 space-y-4">
                     <div class="w-14 h-14 mx-auto rounded-2xl bg-shinobi-red/10 border border-shinobi-red/30 flex items-center justify-center text-shinobi-red text-2xl">
                         <i class="bi bi-camera"></i>
@@ -281,7 +288,7 @@
                             <span>SÉLECTIONNER MA PHOTO</span>
                         </label>
                         <input type="file" id="shinobi-photo-upload" name="source_photo_file" accept="image/*" class="hidden" onchange="handlePhotoUpload(this)">
-                        <span class="block font-mono text-[10px] text-slate-500 mt-2">JPG, PNG ou WebP (max 5 Mo)</span>
+                        <span class="block font-mono text-[10px] text-slate-500 mt-2">JPG, PNG ou WebP (max 30 Mo)</span>
                     </div>
                 </div>
 
@@ -362,37 +369,55 @@
                         </div>
                     </div>
 
-                    <!-- MASQUE FROSTED / SOUS SCEAU -->
-                    <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center space-y-2 border border-shinobi-red/50 rounded-3xl">
-                        <div class="w-14 h-14 rounded-2xl bg-shinobi-red/20 border border-shinobi-red/60 flex items-center justify-center text-shinobi-red text-2xl shadow-lg shadow-shinobi-red/30">
-                            <i class="bi bi-shield-lock-fill"></i>
+                    <!-- MASQUE FROSTED / SOUS SCEAU (si l'utilisateur n'a pas encore payé le Pass) -->
+                    @if(!$user || !$user->has_paid_microtransaction)
+                        <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center space-y-2 border border-shinobi-red/50 rounded-3xl">
+                            <div class="w-14 h-14 rounded-2xl bg-shinobi-red/20 border border-shinobi-red/60 flex items-center justify-center text-shinobi-red text-2xl shadow-lg shadow-shinobi-red/30">
+                                <i class="bi bi-shield-lock-fill"></i>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded-full bg-shinobi-red/20 border border-shinobi-red/40 text-shinobi-red font-mono text-[10px] font-bold uppercase tracking-widest">CARTE SOUS SCEAU</span>
+                            <h4 class="font-serif text-xl font-bold text-white uppercase">Sceau de Protection Actif</h4>
+                            <p class="font-mono text-xs text-slate-300 max-w-xs leading-relaxed">
+                                Le parchemin officiel et le portrait HD sont prêts mais verrouillés.
+                            </p>
                         </div>
-                        <span class="px-2.5 py-0.5 rounded-full bg-shinobi-red/20 border border-shinobi-red/40 text-shinobi-red font-mono text-[10px] font-bold uppercase tracking-widest">CARTE SOUS SCEAU</span>
-                        <h4 class="font-serif text-xl font-bold text-white uppercase">Sceau de Protection Actif</h4>
-                        <p class="font-mono text-xs text-slate-300 max-w-xs leading-relaxed">
-                            Le parchemin officiel et le portrait HD sont prêts mais verrouillés.
-                        </p>
-                    </div>
+                    @endif
                 </div>
 
-                <!-- Les 2 Actions Finales -->
+                <!-- Les Actions Finales -->
                 <div class="text-center space-y-3 pt-2">
-                    <div class="flex flex-col sm:flex-row justify-center items-center gap-3">
-                        <button type="button" 
-                                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-shinobi-gold via-amber-400 to-yellow-500 text-slate-950 font-mono text-xs font-black uppercase tracking-wider hover:brightness-110 transition shadow-xl shadow-shinobi-gold/30" 
-                                onclick="finalizeCreation(true)">
-                            <i class="bi bi-unlock-fill"></i>
-                            <span>DÉVERROUILLER MA CARTE (700 FCFA) ▸</span>
-                        </button>
-                        <button type="button" 
-                                class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3.5 rounded-xl border border-shinobi-border bg-white/5 hover:bg-white/10 text-slate-300 font-mono text-xs uppercase tracking-wider transition" 
-                                onclick="finalizeCreation(false)">
-                            Continuer sans carte ▸
-                        </button>
-                    </div>
-                    <div class="font-mono text-[11px] text-slate-400">
-                        Le déverrouillage inclut l'accès illimité à vie aux tournois et ton portrait officiel HD.
-                    </div>
+                    @if($user && $user->has_paid_microtransaction)
+                        <!-- L'utilisateur a déjà payé : pas de paiement demandé, finalisation directe -->
+                        <div class="flex justify-center items-center">
+                            <button type="button" 
+                                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-white font-mono text-xs sm:text-sm font-black uppercase tracking-wider hover:brightness-110 transition shadow-xl shadow-emerald-500/30 cursor-pointer" 
+                                    onclick="finalizeCreation(true)">
+                                <i class="bi bi-check-circle-fill text-base"></i>
+                                <span>FINALISER & ENTRER DANS L'ARÈNE ▸</span>
+                            </button>
+                        </div>
+                        <div class="font-mono text-[11px] text-emerald-400">
+                            ✓ Ton Pass Shinobi Illimité est actif. Ton portrait officiel sera forgé directement par l'administration.
+                        </div>
+                    @else
+                        <!-- L'utilisateur n'a pas encore de pass : proposition d'achat ou continuer sans carte -->
+                        <div class="flex flex-col sm:flex-row justify-center items-center gap-3">
+                            <button type="button" 
+                                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-shinobi-gold via-amber-400 to-yellow-500 text-slate-950 font-mono text-xs font-black uppercase tracking-wider hover:brightness-110 transition shadow-xl shadow-shinobi-gold/30" 
+                                    onclick="finalizeCreation(true)">
+                                <i class="bi bi-unlock-fill"></i>
+                                <span>DÉVERROUILLER MA CARTE (700 FCFA) ▸</span>
+                            </button>
+                            <button type="button" 
+                                    class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3.5 rounded-xl border border-shinobi-border bg-white/5 hover:bg-white/10 text-slate-300 font-mono text-xs uppercase tracking-wider transition" 
+                                    onclick="finalizeCreation(false)">
+                                Continuer sans carte ▸
+                            </button>
+                        </div>
+                        <div class="font-mono text-[11px] text-slate-400">
+                            Le déverrouillage inclut l'accès illimité à vie aux tournois et ton portrait officiel HD.
+                        </div>
+                    @endif
                 </div>
             </div>
 

@@ -108,8 +108,12 @@ class OnboardingController extends Controller
             $sourcePhotoPath = $validated['source_photo_url'];
         }
 
-        // Handle microtransaction selection
-        $wantsToPay = (bool) ($validated['paid_microtransaction'] ?? false);
+        // Si l'utilisateur possède déjà le Pass Shinobi (déjà payé au préalable) :
+        // Le statut du portrait passe directement à "pending", son paiement reste acquis,
+        // et on ne lui redemande jamais de payer !
+        $alreadyPaid = (bool) $user->has_paid_microtransaction;
+        $wantsToPay = $alreadyPaid || (bool) ($validated['paid_microtransaction'] ?? false);
+        $portraitStatus = $wantsToPay ? 'pending' : 'none';
 
         $fighter = Fighter::create([
             'user_id' => $user->id,
@@ -137,7 +141,7 @@ class OnboardingController extends Controller
             'talent' => $passiveText,
             'source_photo_path' => $sourcePhotoPath,
             'portrait_path' => null,
-            'portrait_status' => $wantsToPay ? 'pending' : 'none',
+            'portrait_status' => $portraitStatus,
             'portrait_ordered_at' => $wantsToPay ? now() : null,
             'level' => 1,
             'xp' => 0,
@@ -181,7 +185,13 @@ class OnboardingController extends Controller
 
         $fighter->jutsus()->syncWithoutDetaching($starterJutsuIds->unique());
 
-        // Si l'utilisateur a choisi l'option payante, on le redirige vers le checkout / Chariow
+        // Si l'utilisateur a déjà payé ou ne souhaite pas payer :
+        if ($alreadyPaid) {
+            return redirect()->route('fighters.my-character')
+                ->with('success', 'Ton nouveau Shinobi a été forgé ! Ton Pass Illimité est actif et ton portrait est en cours de création par l\'administration.');
+        }
+
+        // Si l'utilisateur a choisi l'option payante et n'avait pas encore payé, on le redirige vers le checkout / Chariow
         if ($wantsToPay) {
             return redirect()->route('payment.checkout', ['from_onboarding' => 1])
                 ->with('info', 'Ton Shinobi est forgé ! Finalise maintenant ton Pass Naruto pour débloquer les tournois illimités et ton portrait officiel.');
