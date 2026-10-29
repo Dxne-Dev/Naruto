@@ -15,5 +15,9 @@ php artisan migrate --force || true
 # Start PHP-FPM in background
 php-fpm -D
 
+# Start crond for automated tournament scheduler (php artisan schedule:run every minute)
+echo "* * * * * cd /var/www/html && php artisan schedule:run >> /dev/null 2>&1" > /etc/crontabs/root
+crond -b -l 8
+
 # Start Nginx in foreground
 exec nginx -g "daemon off;"
