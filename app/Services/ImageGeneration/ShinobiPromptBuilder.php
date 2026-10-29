@@ -43,6 +43,18 @@ class ShinobiPromptBuilder
     ];
 
     /**
+     * Combat specialization visual cues for prompt generation.
+     */
+    protected const SPEC_VISUALS = [
+        'Ninjutsu' => 'specialized in elemental Ninjutsu hand seals',
+        'Taijutsu' => 'dynamic martial arts hand-to-hand combat stance, taped knuckles and agility wraps',
+        'Genjutsu' => 'hypnotic illusionary focus, subtle psychedelic chakra distortion in the background',
+        'Fūinjutsu' => 'master of sealing jutsu with ancient inscribed talisman tags and ink scrolls',
+        'Bukijutsu' => 'armed with dual kunai and shuriken weapon holsters',
+        'Hiden' => 'master of secret clan techniques (Hiden Ninjutsu)',
+    ];
+
+    /**
      * Build the primary prompt for Meta Muse / Anime model.
      * Optimised specifically for Image-to-Image (Img2Img) style transfer:
      * Transforms the subject in the source photo into a 2D Naruto anime shinobi while
@@ -64,6 +76,7 @@ class ShinobiPromptBuilder
 
         $rank = $fighter->ninja_rank;
         $spec = $fighter->specialization;
+        $specVisual = self::SPEC_VISUALS[$spec] ?? "combat specialization in {$spec}";
 
         return implode(', ', [
             'Image-to-Image character adaptation of the person in the input photo',
@@ -72,7 +85,7 @@ class ShinobiPromptBuilder
             'stylize into hand-drawn 2D anime character in authentic Masashi Kishimoto Studio Pierrot Naruto Shippuden style',
             "wearing {$villageCues}",
             "attired as a prestigious member of the {$clan} clan ({$clanCues})",
-            "combat specialization in {$spec}",
+            $specVisual,
             $elemAura,
             'crisp clean cel-shading, sharp ink lineart, vibrant anime colors, cinematic rim lighting',
             'official Databook key visual illustration, official Shonen Jump character art, 8k resolution, masterpiece',
