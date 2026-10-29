@@ -173,7 +173,18 @@ class FighterController extends Controller
             'jutsus',
             'xpTransactions' => fn ($q) => $q->latest()->take(10),
         ]);
-        $isOwner = auth()->check() && auth()->id() === $fighter->user_id;
+
+        $currentUser = auth()->user();
+        $isOwner = $currentUser && $currentUser->id === $fighter->user_id;
+
+        // Si la personne qui consulte n'est PAS le propriétaire du shinobi (ex: l'Admin ou un autre joueur),
+        // on n'affiche QUE le bloc maître (la Carte Shinobi & Databook) sans projeter l'espace de gestion complet
+        if (! $isOwner) {
+            return view('fighters.card', [
+                'fighter' => $fighter,
+                'isOwner' => false,
+            ]);
+        }
 
         $nextTournament = Tournament::whereIn('status', [Tournament::STATUS_REGISTRATION, Tournament::STATUS_RUNNING])
             ->withCount('entries')
@@ -189,8 +200,8 @@ class FighterController extends Controller
 
         return view('fighters.show', [
             'fighter' => $fighter,
-            'isOwner' => $isOwner,
-            'wheelTokens' => auth()->user()?->wheel_tokens ?? 0,
+            'isOwner' => true,
+            'wheelTokens' => $currentUser->wheel_tokens ?? 0,
             'nextTournament' => $nextTournament,
             'recentBattles' => $recentBattles,
         ]);
