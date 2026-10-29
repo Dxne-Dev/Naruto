@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminGiftController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\PassRequestAdminController;
 use App\Http\Controllers\Admin\PortraitAdminController;
@@ -153,6 +154,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/user/{user}/toggle-suspension', [UserAdminController::class, 'toggleSuspension'])->name('users.toggle-suspension');
         Route::delete('/user/{user}', [UserAdminController::class, 'destroy'])->name('users.destroy');
         Route::delete('/user/{user}/fighter', [UserAdminController::class, 'deleteFighter'])->name('users.delete-fighter');
+
+        // Admin Gifts & Player Economy (/admin/cadeaux)
+        Route::get('/cadeaux', [AdminGiftController::class, 'index'])->name('gifts.index');
+        Route::post('/cadeaux/{user}/toggle-pass', [AdminGiftController::class, 'togglePass'])->name('gifts.toggle-pass');
+        Route::post('/cadeaux/{user}/send-xp', [AdminGiftController::class, 'sendXp'])->name('gifts.send-xp');
+        Route::post('/cadeaux/{user}/send-tokens', [AdminGiftController::class, 'sendTokens'])->name('gifts.send-tokens');
 
         // Wizard of Oz Portrait Management (/admin/portraits)
         Route::get('/portraits', [PortraitAdminController::class, 'index'])->name('portraits.index');

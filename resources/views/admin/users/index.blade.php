@@ -78,6 +78,11 @@
                                         </td>
                                         <td class="text-end">
                                             <div class="d-inline-flex gap-1">
+                                                <!-- Cadeau / Action rapide -->
+                                                <a href="{{ route('admin.gifts.index', ['q' => $u->username]) }}" class="btn btn-sm btn-outline-primary" title="Espace Cadeau (XP, Jetons, Pass)">
+                                                    <i class="bi bi-gift-fill"></i>
+                                                </a>
+
                                                 <!-- Suspension -->
                                                 <form action="{{ route('admin.users.toggle-suspension', $u) }}" method="POST" class="d-inline">
                                                     @csrf

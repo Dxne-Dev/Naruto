@@ -81,6 +81,17 @@
                     </a>
                 </li>
 
+                <!-- Cadeaux Admin (XP, Jetons, Pass) -->
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.gifts.*') ? 'active' : '' }}" href="{{ route('admin.gifts.index') }}">
+                        <i class="icon text-primary">
+                            <i class="bi bi-gift-fill fs-5"></i>
+                        </i>
+                        <span class="item-name fw-bold">Cadeaux Admin</span>
+                        <span class="badge bg-primary text-white ms-auto font-mono" style="font-size: 10px;">PRO</span>
+                    </a>
+                </li>
+
                 <!-- Validation Pass Shinobi -->
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.pass-requests.*') ? 'active' : '' }}" href="{{ route('admin.pass-requests.index') }}">
