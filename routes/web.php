@@ -27,6 +27,9 @@ use Illuminate\Support\Facades\Storage;
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
 
+// Public Webhook for Chariow Pulse & Aggregators (CSRF exempt, No auth required)
+Route::match(['GET', 'POST'], '/checkout/webhook', [PaymentController::class, 'webhook'])->name('payment.webhook');
+
 // Secure Local/Production Storage Static Serving Fallback
 Route::get('/storage/{path}', function (string $path) {
     Log::info('GET /storage route hit:', [
@@ -125,7 +128,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout/upload-photo', [PaymentController::class, 'uploadPhoto'])->name('payment.upload-photo');
     Route::post('/checkout/notify-ack/{passRequest}', [PaymentController::class, 'acknowledgeNotification'])->name('payment.ack-notification');
     Route::get('/checkout/success', [PaymentController::class, 'success'])->name('payment.success');
-    Route::post('/checkout/webhook', [PaymentController::class, 'webhook'])->name('payment.webhook');
 
     // Battles (Playback & Training Duel)
     Route::get('/battles/{battle}', [BattleController::class, 'show'])->name('battles.show');

@@ -181,19 +181,31 @@ class PaymentController extends Controller
 
     /**
      * Webhook endpoint for live aggregators / Chariow Pulses.
+     * Supports both GET (health check / ping) and POST (live transaction webhook).
      */
     public function webhook(Request $request)
     {
+        if ($request->isMethod('GET')) {
+            return response()->json([
+                'status' => 'success',
+                'service' => 'Otaku Arena Pulse Webhook',
+                'message' => 'Endpoint reachable and ready to receive POST webhooks',
+            ], 200);
+        }
+
         $payload = $request->all();
         Log::info('Chariow Pulse webhook received:', $payload);
 
         // Find user by custom_user_id or email
         $userId = $payload['custom_user_id']
             ?? $payload['custom_fields']['custom_user_id']
+            ?? $payload['metadata']['custom_user_id']
+            ?? $payload['data']['custom_user_id']
             ?? $payload['user_id']
             ?? null;
 
         $email = $payload['customer']['email']
+            ?? $payload['data']['customer']['email']
             ?? $payload['email']
             ?? null;
 
@@ -220,6 +232,6 @@ class PaymentController extends Controller
             Log::info("Pass Shinobi activated via Pulse for user #{$user->id} ({$user->username})");
         }
 
-        return response()->json(['status' => 'success', 'message' => 'Pulse processed']);
+        return response()->json(['status' => 'success', 'message' => 'Pulse processed'], 200);
     }
 }
