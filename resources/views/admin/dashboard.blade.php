@@ -120,12 +120,12 @@
                                     <tr>
                                         <td>
                                             <div class="fw-bold">{{ $tournament->title }}</div>
-                                            <small class="text-muted">Type : {{ ucfirst($tournament->type) }} ({{ $tournament->max_participants }} places)</small>
+                                            <small class="text-muted">{{ $tournament->max_participants ?? 8 }} places max</small>
                                         </td>
                                         <td>
-                                            @if($tournament->status === 'open')
+                                            @if($tournament->status === 'registration' || $tournament->status === 'open')
                                                 <span class="badge bg-success">Inscriptions Ouvertes</span>
-                                            @elseif($tournament->status === 'in_progress')
+                                            @elseif($tournament->status === 'running' || $tournament->status === 'in_progress' || $tournament->status === 'locked')
                                                 <span class="badge bg-warning text-dark">En Cours</span>
                                             @elseif($tournament->status === 'completed')
                                                 <span class="badge bg-secondary">Terminé</span>
@@ -135,19 +135,24 @@
                                         </td>
                                         <td>
                                             @php
+                                                $maxPart = $tournament->max_participants ?: 8;
                                                 $count = $tournament->entries_count ?? $tournament->entries()->count();
-                                                $percent = min(100, round(($count / $tournament->max_participants) * 100));
+                                                $percent = min(100, round(($count / $maxPart) * 100));
                                             @endphp
                                             <div class="d-flex align-items-center gap-2">
                                                 <div class="progress flex-grow-1" style="height: 6px;">
                                                     <div class="progress-bar bg-primary" role="progressbar" style="width: {{ $percent }}%;" aria-valuenow="{{ $percent }}" aria-valuemin="0" aria-valuemax="100"></div>
                                                 </div>
-                                                <span class="small font-weight-bold">{{ $count }}/{{ $tournament->max_participants }}</span>
+                                                <span class="small font-weight-bold">{{ $count }}/{{ $maxPart }}</span>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="small">{{ $tournament->registration_closes_at->format('d/m/Y H:i') }}</div>
-                                            <small class="text-muted">{{ $tournament->registration_closes_at->diffForHumans() }}</small>
+                                            @if($tournament->registration_closes_at)
+                                                <div class="small">{{ $tournament->registration_closes_at->format('d/m/Y H:i') }}</div>
+                                                <small class="text-muted">{{ $tournament->registration_closes_at->diffForHumans() }}</small>
+                                            @else
+                                                <span class="small text-muted">Non définie</span>
+                                            @endif
                                         </td>
                                         <td class="text-end">
                                             <div class="d-inline-flex gap-1">
