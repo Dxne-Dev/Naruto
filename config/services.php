@@ -54,4 +54,10 @@ return [
         'model' => env('GROQ_MODEL', 'openai/gpt-oss-120b'),
     ],
 
+    'supabase' => [
+        'url' => env('SUPABASE_URL'),
+        'key' => env('SUPABASE_KEY'),
+        'bucket' => env('SUPABASE_BUCKET', 'shinobi'),
+    ],
+
 ];

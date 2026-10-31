@@ -5,16 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Fighter;
 use App\Models\Jutsu;
 use App\Services\FighterGenerator;
+use App\Services\SupabaseStorageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class OnboardingController extends Controller
 {
     public function __construct(
         protected FighterGenerator $fighterGenerator,
+        protected SupabaseStorageService $storageService,
     ) {}
 
     /**
@@ -84,26 +85,12 @@ class OnboardingController extends Controller
         $sourcePhotoPath = null;
         if ($request->hasFile('source_photo_file')) {
             $uploadedFile = $request->file('source_photo_file');
-            $originalName = $uploadedFile->getClientOriginalName();
-            $fileSize = $uploadedFile->getSize();
-            $mimeType = $uploadedFile->getMimeType();
+            $sourcePhotoPath = $this->storageService->upload($uploadedFile, 'source_photos');
 
-            $path = $uploadedFile->store('source_photos', 'public');
-            $fullDiskPath = storage_path('app/public/'.$path);
-            $existsOnDisk = file_exists($fullDiskPath);
-
-            Log::info('Onboarding Photo Upload Debug:', [
+            Log::info('Onboarding Photo Upload:', [
                 'user_id' => $user->id,
-                'original_name' => $originalName,
-                'file_size_bytes' => $fileSize,
-                'mime_type' => $mimeType,
-                'stored_path' => $path,
-                'full_disk_path' => $fullDiskPath,
-                'exists_immediately_on_disk' => $existsOnDisk,
-                'storage_url' => Storage::url($path),
+                'source_photo_path' => $sourcePhotoPath,
             ]);
-
-            $sourcePhotoPath = Storage::url($path);
         } elseif (! empty($validated['source_photo_url'])) {
             $sourcePhotoPath = $validated['source_photo_url'];
         }

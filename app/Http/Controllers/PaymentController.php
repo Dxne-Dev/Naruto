@@ -5,16 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\PassRequest;
 use App\Models\User;
 use App\Services\ImageGeneration\ShinobiImageService;
+use App\Services\SupabaseStorageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class PaymentController extends Controller
 {
     public function __construct(
         protected ShinobiImageService $imageService,
+        protected SupabaseStorageService $storageService,
     ) {}
 
     /**
@@ -108,9 +109,9 @@ class PaymentController extends Controller
 
         // Si l'utilisateur a attaché sa photo de combattant lors de la demande
         if ($request->hasFile('source_photo_file') && $user->fighter) {
-            $path = $request->file('source_photo_file')->store('source_photos', 'public');
+            $publicUrl = $this->storageService->upload($request->file('source_photo_file'), 'source_photos');
             $user->fighter->update([
-                'source_photo_path' => Storage::url($path),
+                'source_photo_path' => $publicUrl,
             ]);
         }
 
@@ -139,28 +140,16 @@ class PaymentController extends Controller
         ]);
 
         $uploadedFile = $request->file('source_photo_file');
-        $originalName = $uploadedFile->getClientOriginalName();
-        $fileSize = $uploadedFile->getSize();
-        $mimeType = $uploadedFile->getMimeType();
+        $publicUrl = $this->storageService->upload($uploadedFile, 'source_photos');
 
-        $path = $uploadedFile->store('source_photos', 'public');
-        $fullDiskPath = storage_path('app/public/'.$path);
-        $existsOnDisk = file_exists($fullDiskPath);
-
-        Log::info('PaymentController Photo Upload Debug:', [
+        Log::info('PaymentController Photo Upload:', [
             'user_id' => $user->id,
             'fighter_id' => $fighter->id,
-            'original_name' => $originalName,
-            'file_size_bytes' => $fileSize,
-            'mime_type' => $mimeType,
-            'stored_path' => $path,
-            'full_disk_path' => $fullDiskPath,
-            'exists_immediately_on_disk' => $existsOnDisk,
-            'storage_url' => Storage::url($path),
+            'source_photo_path' => $publicUrl,
         ]);
 
         $fighter->update([
-            'source_photo_path' => Storage::url($path),
+            'source_photo_path' => $publicUrl,
             'portrait_status' => $user->has_paid_microtransaction ? 'pending' : $fighter->portrait_status,
         ]);
 

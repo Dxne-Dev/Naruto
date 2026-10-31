@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Fighter;
 use App\Services\ImageGeneration\ShinobiPromptBuilder;
+use App\Services\SupabaseStorageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -15,6 +15,7 @@ class PortraitAdminController extends Controller
 {
     public function __construct(
         protected ShinobiPromptBuilder $promptBuilder,
+        protected SupabaseStorageService $storageService,
     ) {}
 
     /**
@@ -72,18 +73,7 @@ class PortraitAdminController extends Controller
             abort(404, 'Aucune photo source enregistrée pour ce combattant.');
         }
 
-        // Si le chemin commence par /storage/
-        $cleanPath = preg_replace('#^/storage/#', '', $path);
-        if (Storage::disk('public')->exists($cleanPath)) {
-            return Storage::disk('public')->download($cleanPath, "photo_source_shinobi_{$fighter->id}.jpg");
-        }
-
-        // Si c'est un fichier local direct
-        if (file_exists(public_path($path))) {
-            return response()->download(public_path($path), "photo_source_shinobi_{$fighter->id}.jpg");
-        }
-
-        return redirect($fighter->source_photo_url);
+        return $this->storageService->download($path, "photo_source_shinobi_{$fighter->id}.jpg");
     }
 
     /**
@@ -96,10 +86,9 @@ class PortraitAdminController extends Controller
         ]);
 
         $file = $request->file('portrait_file');
-        $filename = 'portraits/shinobi_'.$fighter->id.'_'.Str::random(10).'.'.$file->getClientOriginalExtension();
+        $filename = 'shinobi_'.$fighter->id.'_'.Str::random(10).'.'.$file->getClientOriginalExtension();
 
-        Storage::disk('public')->put($filename, file_get_contents($file));
-        $publicUrl = Storage::url($filename);
+        $publicUrl = $this->storageService->upload($file, 'portraits', $filename);
 
         $fighter->update([
             'portrait_path' => $publicUrl,

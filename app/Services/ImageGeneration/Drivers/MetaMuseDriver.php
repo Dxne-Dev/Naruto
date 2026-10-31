@@ -5,6 +5,7 @@ namespace App\Services\ImageGeneration\Drivers;
 use App\Models\Fighter;
 use App\Services\ImageGeneration\Contracts\ShinobiImageGeneratorInterface;
 use App\Services\ImageGeneration\ShinobiPromptBuilder;
+use App\Services\SupabaseStorageService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -15,6 +16,7 @@ class MetaMuseDriver implements ShinobiImageGeneratorInterface
     public function __construct(
         protected ShinobiPromptBuilder $promptBuilder,
         protected LocalFallbackDriver $fallbackDriver,
+        protected SupabaseStorageService $storageService,
     ) {}
 
     public function generate(Fighter $fighter, ?string $sourcePhotoUrl = null): string
@@ -106,17 +108,16 @@ class MetaMuseDriver implements ShinobiImageGeneratorInterface
     }
 
     /**
-     * Download the remote image and save to local storage.
+     * Download the remote image and save to local or Supabase storage.
      */
     protected function downloadAndStore(string $remoteUrl, Fighter $fighter): string
     {
         try {
             $contents = file_get_contents($remoteUrl);
             if ($contents) {
-                $filename = 'portraits/shinobi_'.$fighter->id.'_'.Str::random(8).'.png';
-                Storage::disk('public')->put($filename, $contents);
+                $filename = 'shinobi_'.$fighter->id.'_'.Str::random(8).'.png';
 
-                return Storage::url($filename);
+                return $this->storageService->upload($contents, 'portraits', $filename);
             }
         } catch (\Throwable $e) {
             Log::warning('Could not download remote portrait: '.$e->getMessage());
@@ -131,9 +132,8 @@ class MetaMuseDriver implements ShinobiImageGeneratorInterface
     protected function storeBase64(string $base64, Fighter $fighter): string
     {
         $data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $base64));
-        $filename = 'portraits/shinobi_'.$fighter->id.'_'.Str::random(8).'.png';
-        Storage::disk('public')->put($filename, $data);
+        $filename = 'shinobi_'.$fighter->id.'_'.Str::random(8).'.png';
 
-        return Storage::url($filename);
+        return $this->storageService->upload($data, 'portraits', $filename);
     }
 }

@@ -66,7 +66,7 @@
                                     <td>
                                         @if($fighter->source_photo_path)
                                             <div class="position-relative rounded-3 overflow-hidden border shadow-sm" style="width: 72px; height: 72px; background: #0E0D0F;">
-                                                <img src="{{ $fighter->source_photo_url }}" alt="Photo Source" class="w-100 h-100 object-fit-cover">
+                                                <img src="{{ $fighter->source_photo_url }}" alt="Photo Source" class="w-100 h-100 object-fit-cover" onerror="this.onerror=null;this.src='{{ asset('images/naruto-hero.png') }}';">
                                             </div>
                                             <a href="{{ route('admin.portraits.download-source', $fighter) }}" class="btn btn-xs btn-outline-dark mt-1 font-monospace py-0 px-1 text-nowrap" style="font-size: 10px;">
                                                 <i class="bi bi-download me-0.5"></i> Télécharger
@@ -138,7 +138,7 @@
                                     <td class="text-end pe-4">
                                         @if($fighter->portrait_path)
                                             <div class="d-flex align-items-center justify-content-end gap-2 mb-2">
-                                                <img src="{{ $fighter->portrait_url }}" alt="Portrait Actuel" class="rounded border shadow-sm" style="width: 38px; height: 38px; object-fit: cover;">
+                                                <img src="{{ $fighter->portrait_url }}" alt="Portrait Actuel" class="rounded border shadow-sm" style="width: 38px; height: 38px; object-fit: cover;" onerror="this.onerror=null;this.src='{{ asset('images/naruto-hero.png') }}';">
                                                 <a href="{{ route('fighters.show', $fighter) }}" target="_blank" class="btn btn-xs btn-outline-secondary py-0 px-1 font-monospace" style="font-size: 10px;" title="Voir la carte du joueur">
                                                     <i class="bi bi-box-arrow-up-right me-0.5"></i> Carte
                                                 </a>

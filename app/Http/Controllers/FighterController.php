@@ -9,18 +9,19 @@ use App\Models\Tournament;
 use App\Models\User;
 use App\Services\FighterGenerator;
 use App\Services\ImageGeneration\ShinobiImageService;
+use App\Services\SupabaseStorageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class FighterController extends Controller
 {
     public function __construct(
         protected FighterGenerator $generator,
-        protected ShinobiImageService $imageService
+        protected ShinobiImageService $imageService,
+        protected SupabaseStorageService $storageService
     ) {}
 
     /**
@@ -404,8 +405,8 @@ class FighterController extends Controller
         $sourcePhoto = $fighter->portrait_path;
 
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('source_photos', 'public');
-            $sourcePhoto = Storage::url($path);
+            $sourcePhoto = $this->storageService->upload($request->file('photo'), 'source_photos');
+            $fighter->update(['source_photo_path' => $sourcePhoto]);
         } elseif (! empty($validated['photo_url'])) {
             $sourcePhoto = $validated['photo_url'];
         }
