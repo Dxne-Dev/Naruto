@@ -94,7 +94,7 @@
                         <!-- Moi -->
                         <div class="sm:col-span-5 p-4 rounded-2xl bg-shinobi-dark/80 border border-shinobi-border flex items-center gap-3">
                             <div class="w-14 h-14 rounded-xl overflow-hidden border border-shinobi-gold/50 shrink-0 bg-black">
-                                <img src="{{ $mySide?->portrait_path ?? ($mySide?->source_photo_path ?? asset('images/naruto-hero.png')) }}" alt="{{ $mySide?->name }}" class="w-full h-full object-cover">
+                                <img src="{{ $mySide?->display_avatar_url ?? asset('images/naruto-hero.png') }}" alt="{{ $mySide?->name }}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='{{ asset('images/naruto-hero.png') }}';">
                             </div>
                             <div class="min-w-0">
                                 <span class="badge bg-shinobi-gold/20 text-shinobi-gold border border-shinobi-gold/40 font-mono text-[9px] mb-1">MON SHINOBI</span>
@@ -113,7 +113,7 @@
                         <!-- Adversaire -->
                         <div class="sm:col-span-5 p-4 rounded-2xl bg-shinobi-dark/80 border border-shinobi-border flex items-center justify-between sm:justify-start gap-3 text-right sm:text-left">
                             <div class="w-14 h-14 rounded-xl overflow-hidden border border-shinobi-border shrink-0 bg-black order-last sm:order-first">
-                                <img src="{{ $opponent?->portrait_path ?? ($opponent?->source_photo_path ?? asset('images/naruto-hero.png')) }}" alt="{{ $opponent?->name }}" class="w-full h-full object-cover">
+                                <img src="{{ $opponent?->display_avatar_url ?? asset('images/naruto-hero.png') }}" alt="{{ $opponent?->name }}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='{{ asset('images/naruto-hero.png') }}';">
                             </div>
                             <div class="min-w-0 flex-1">
                                 <span class="badge bg-white/10 text-slate-300 font-mono text-[9px] mb-1">ADVERSAIRE</span>
@@ -337,7 +337,7 @@
                     <!-- Fighter A -->
                     <div class="sm:col-span-5 p-4 rounded-2xl {{ $win && $win->id === $fA?->id ? 'bg-shinobi-gold/10 border-2 border-shinobi-gold' : 'bg-shinobi-dark/70 border border-shinobi-border' }} flex items-center gap-3">
                         <div class="w-12 h-12 rounded-xl overflow-hidden bg-black shrink-0 border border-white/10">
-                            <img src="{{ $fA?->portrait_path ?? ($fA?->source_photo_path ?? asset('images/naruto-hero.png')) }}" alt="{{ $fA?->name }}" class="w-full h-full object-cover">
+                            <img src="{{ $fA?->display_avatar_url ?? asset('images/naruto-hero.png') }}" alt="{{ $fA?->name }}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='{{ asset('images/naruto-hero.png') }}';">
                         </div>
                         <div class="min-w-0">
                             <span class="text-[9px] font-mono text-slate-400 uppercase">Clan {{ $fA?->clan }}</span>
@@ -356,7 +356,7 @@
                     <!-- Fighter B -->
                     <div class="sm:col-span-5 p-4 rounded-2xl {{ $win && $win->id === $fB?->id ? 'bg-shinobi-gold/10 border-2 border-shinobi-gold' : 'bg-shinobi-dark/70 border border-shinobi-border' }} flex items-center gap-3">
                         <div class="w-12 h-12 rounded-xl overflow-hidden bg-black shrink-0 border border-white/10">
-                            <img src="{{ $fB?->portrait_path ?? ($fB?->source_photo_path ?? asset('images/naruto-hero.png')) }}" alt="{{ $fB?->name }}" class="w-full h-full object-cover">
+                            <img src="{{ $fB?->display_avatar_url ?? asset('images/naruto-hero.png') }}" alt="{{ $fB?->name }}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='{{ asset('images/naruto-hero.png') }}';">
                         </div>
                         <div class="min-w-0">
                             <span class="text-[9px] font-mono text-slate-400 uppercase">Clan {{ $fB?->clan }}</span>

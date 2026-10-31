@@ -110,9 +110,10 @@
                                     class="flex items-center gap-1.5 sm:gap-2 p-1 sm:pl-1.5 sm:pr-2.5 rounded-full bg-shinobi-card border border-shinobi-border hover:border-shinobi-red/50 transition cursor-pointer select-none">
                                 <div class="w-7 h-7 rounded-full bg-black border border-shinobi-red overflow-hidden shrink-0 flex items-center justify-center">
                                     @if($userHasPaid && $userFighter)
-                                        <img src="{{ $userFighter->portrait_url ?? ($userFighter->source_photo_url ?? 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=100&auto=format&fit=crop&q=80') }}" 
+                                        <img src="{{ $userFighter->display_avatar_url }}" 
                                              alt="{{ $userFighter->name }}" 
-                                             class="w-full h-full object-cover">
+                                             class="w-full h-full object-cover"
+                                             onerror="this.onerror=null;this.src='{{ asset('images/naruto-hero.png') }}';">
                                     @else
                                         <img src="{{ asset('images/locked-avatar.png') }}" 
                                              alt="Verrouillé" 

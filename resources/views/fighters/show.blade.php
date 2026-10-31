@@ -126,9 +126,10 @@
                         $portraitPending = $hasPaidPass && !$portraitReady;
                     @endphp
 
-                    <img src="{{ $fighter->portrait_url ?? ($fighter->source_photo_url ?? asset('images/naruto-hero.png')) }}" 
+                    <img src="{{ $fighter->display_avatar_url }}" 
                          alt="{{ $fighter->name }}" 
-                         class="w-full h-full object-cover object-top {{ (!$hasPaidPass || $portraitPending) ? 'filter blur-2xl scale-110 opacity-30 brightness-50' : 'group-hover:scale-105' }} transition-all duration-700">
+                         class="w-full h-full object-cover object-top {{ (!$hasPaidPass || $portraitPending) ? 'filter blur-2xl scale-110 opacity-30 brightness-50' : 'group-hover:scale-105' }} transition-all duration-700"
+                         onerror="this.onerror=null;this.src='{{ asset('images/naruto-hero.png') }}';">
                     
                     <!-- Masquage Premier Plan : Image Cadenas Locked officielle si non payé -->
                     @if(!$hasPaidPass)

@@ -122,9 +122,10 @@
                         $portraitReady = $fighter->portrait_status === 'ready' && !empty($fighter->portrait_path);
                     @endphp
 
-                    <img src="{{ $fighter->portrait_url ?? ($fighter->source_photo_url ?? asset('images/naruto-hero.png')) }}" 
+                    <img src="{{ $fighter->display_avatar_url }}" 
                          alt="{{ $fighter->name }}" 
-                         class="w-full h-full object-cover object-top {{ (!$portraitReady && !$hasPaidPass) ? 'filter blur-2xl scale-110 opacity-30 brightness-50' : 'group-hover:scale-105' }} transition-all duration-700">
+                         class="w-full h-full object-cover object-top {{ (!$portraitReady && !$hasPaidPass) ? 'filter blur-2xl scale-110 opacity-30 brightness-50' : 'group-hover:scale-105' }} transition-all duration-700"
+                         onerror="this.onerror=null;this.src='{{ asset('images/naruto-hero.png') }}';">
 
                     <!-- Sceau Kanji discret en filigrane -->
                     <div class="absolute top-2 right-3 font-serif text-4xl font-black text-white/10 select-none pointer-events-none">

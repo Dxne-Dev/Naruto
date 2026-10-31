@@ -115,11 +115,16 @@ class Fighter extends Model
     public function getSourcePhotoUrlAttribute(): ?string
     {
         if (! $this->source_photo_path) {
-            return null;
+            return asset('images/naruto-hero.png');
         }
 
         if (str_starts_with($this->source_photo_path, 'http://') || str_starts_with($this->source_photo_path, 'https://')) {
             return $this->source_photo_path;
+        }
+
+        // Special handling for local/preset ninja_shadow.png
+        if ($this->source_photo_path === 'ninja_shadow.png') {
+            return asset('images/naruto-hero.png');
         }
 
         return asset(ltrim($this->source_photo_path, '/'));
@@ -138,7 +143,19 @@ class Fighter extends Model
             return $this->portrait_path;
         }
 
+        if ($this->portrait_path === 'ninja_shadow.png') {
+            return asset('images/naruto-hero.png');
+        }
+
         return asset(ltrim($this->portrait_path, '/'));
+    }
+
+    /**
+     * Get the best resolved image URL for avatar displays across the app.
+     */
+    public function getDisplayAvatarUrlAttribute(): string
+    {
+        return $this->portrait_url ?? ($this->source_photo_url ?? asset('images/naruto-hero.png'));
     }
 
     /**

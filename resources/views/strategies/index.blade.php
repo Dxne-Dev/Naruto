@@ -24,9 +24,10 @@
             <div class="flex items-center gap-5">
                 <div class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 border-shinobi-red/60 shadow-xl shadow-shinobi-red/20 shrink-0 bg-black">
                     @if($hasPaidPass)
-                        <img src="{{ $fighter->portrait_path ?? ($fighter->source_photo_path ?? asset('images/naruto-hero.png')) }}" 
+                        <img src="{{ $fighter->display_avatar_url }}" 
                              alt="{{ $fighter->name }}" 
-                             class="w-full h-full object-cover object-top">
+                             class="w-full h-full object-cover object-top"
+                             onerror="this.onerror=null;this.src='{{ asset('images/naruto-hero.png') }}';">
                     @else
                         <!-- Portrait Verrouillé (Pass Non Débloqué) -->
                         <div class="relative w-full h-full bg-black select-none">

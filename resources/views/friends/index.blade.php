@@ -143,9 +143,10 @@
                         <div class="flex items-center gap-4 min-w-0">
                             <!-- Avatar circulaire avec pastille de vérité absolue (En ligne / Hors ligne) -->
                             <div class="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 {{ $isOnline ? 'border-emerald-500/80 shadow-[0_0_12px_rgba(16,185,129,0.3)]' : 'border-shinobi-border' }} overflow-hidden shrink-0 bg-black">
-                                <img src="{{ $friendFighter?->portrait_path ?? ($friendFighter?->source_photo_path ?? asset('images/naruto-hero.png')) }}" 
+                                <img src="{{ $friendFighter?->display_avatar_url ?? asset('images/naruto-hero.png') }}" 
                                      alt="{{ $friendUser->username }}" 
-                                     class="w-full h-full object-cover">
+                                     class="w-full h-full object-cover"
+                                     onerror="this.onerror=null;this.src='{{ asset('images/naruto-hero.png') }}';">
                                 <span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full {{ $isOnline ? 'bg-emerald-400 ring-2 ring-shinobi-dark' : 'bg-slate-600 ring-2 ring-shinobi-dark' }}" title="{{ $isOnline ? 'En ligne' : 'Hors ligne' }}"></span>
                             </div>
 

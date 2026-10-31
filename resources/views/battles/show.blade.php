@@ -45,9 +45,10 @@
                  :class="(currentHpA <= 0) ? 'border-rose-900 bg-black/60 opacity-60' : 'border-shinobi-border bg-shinobi-dark/80'">
                 <div class="flex items-center gap-4">
                     <div class="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-shinobi-red/70 shadow-lg shadow-shinobi-red/30 shrink-0 bg-black">
-                        <img src="{{ $fighterA?->portrait_path ?? ($fighterA?->source_photo_path ?? asset('images/naruto-hero.png')) }}" 
+                        <img src="{{ $fighterA?->display_avatar_url ?? asset('images/naruto-hero.png') }}" 
                              alt="{{ $fighterA?->name }}" 
-                             class="w-full h-full object-cover object-top">
+                             class="w-full h-full object-cover object-top"
+                             onerror="this.onerror=null;this.src='{{ asset('images/naruto-hero.png') }}';">
                         <span class="absolute bottom-0 right-0 bg-shinobi-red text-white font-mono text-[9px] font-bold px-1.5 py-0.2 rounded-tl">
                             N.{{ $fighterA?->level ?? 1 }}
                         </span>
@@ -110,9 +111,10 @@
                  :class="(currentHpB <= 0) ? 'border-rose-900 bg-black/60 opacity-60' : 'border-shinobi-border bg-shinobi-dark/80'">
                 <div class="flex items-center gap-4">
                     <div class="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-shinobi-chakra/70 shadow-lg shadow-shinobi-chakra/30 shrink-0 bg-black">
-                        <img src="{{ $fighterB?->portrait_path ?? ($fighterB?->source_photo_path ?? asset('images/naruto-hero.png')) }}" 
+                        <img src="{{ $fighterB?->display_avatar_url ?? asset('images/naruto-hero.png') }}" 
                              alt="{{ $fighterB?->name }}" 
-                             class="w-full h-full object-cover object-top">
+                             class="w-full h-full object-cover object-top"
+                             onerror="this.onerror=null;this.src='{{ asset('images/naruto-hero.png') }}';">
                         <span class="absolute bottom-0 right-0 bg-shinobi-chakra text-shinobi-dark font-mono text-[9px] font-bold px-1.5 py-0.2 rounded-tl">
                             N.{{ $fighterB?->level ?? 1 }}
                         </span>
