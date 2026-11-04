@@ -2,18 +2,51 @@
 
 @section('title', 'Salon Privé — ' . $tournament->title)
 
+@section('og_meta')
+    <meta property="og:site_name" content="Otaku Arena">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ $challengeTitle }}">
+    <meta property="og:description" content="Rejoins le salon privé « {{ $tournament->title }} » (Code : {{ $tournament->room_code }}) sur Otaku Arena. Révèle ton nindô et combats pour la victoire !">
+    <meta property="og:image" content="{{ $ogImage }}">
+    <meta property="og:url" content="{{ $shareUrl }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $challengeTitle }}">
+    <meta name="twitter:description" content="Rejoins le salon privé « {{ $tournament->title }} » (Code : {{ $tournament->room_code }}) sur Otaku Arena !">
+    <meta name="twitter:image" content="{{ $ogImage }}">
+@endsection
+
 @section('content')
 <div class="space-y-6" x-data="{
-    copied: false,
-    copyCode(code) {
-        navigator.clipboard.writeText(code);
-        this.copied = true;
-        setTimeout(() => this.copied = false, 2500);
+    copiedType: null,
+    shareUrl: '{{ $shareUrl }}',
+    shareCode: '{{ $tournament->room_code }}',
+    shareTitle: @js($challengeTitle),
+    shareMessage: @js('⚔️ ' . $challengeTitle . "\n\nRejoins mon salon privé « " . $tournament->title . " » sur Otaku Arena !\nCode de combat : " . $tournament->room_code . "\nLien direct : " . $shareUrl),
+    copyText(text, type) {
+        navigator.clipboard.writeText(text);
+        this.copiedType = type;
+        setTimeout(() => this.copiedType = null, 2500);
     },
-    copyLink(url) {
-        navigator.clipboard.writeText(url);
-        this.copied = true;
-        setTimeout(() => this.copied = false, 2500);
+    async shareNative() {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: this.shareTitle,
+                    text: this.shareMessage,
+                    url: this.shareUrl
+                });
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    this.copyText(this.shareMessage, 'all');
+                }
+            }
+        } else {
+            this.copyText(this.shareMessage, 'all');
+        }
+    },
+    shareWhatsApp() {
+        const url = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(this.shareMessage);
+        window.open(url, '_blank');
     }
 }">
 
@@ -25,7 +58,7 @@
         <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             
             <div class="space-y-2">
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2">
                     <span class="rounded-full border border-shinobi-red/30 bg-shinobi-red/10 px-3 py-0.5 font-mono text-[10px] font-bold text-shinobi-red uppercase">
                         SALON PRIVÉ • {{ $tournament->max_participants }} JOUEURS
                     </span>
@@ -44,37 +77,78 @@
                     {{ $tournament->title }}
                 </h1>
 
+                <!-- Message de défi affiché fièrement -->
+                <p class="font-mono text-xs text-amber-300/90 flex items-center gap-1.5 font-semibold">
+                    <i class="bi bi-swords text-shinobi-gold"></i>
+                    <span>{{ $challengeTitle }}</span>
+                </p>
+
                 <p class="font-mono text-xs text-slate-300">
-                    Créé par <strong class="text-white">{{ $tournament->creator?->name ?? 'Ninja' }}</strong> • 
+                    Créé par <strong class="text-white">{{ $creatorShinobiName }}</strong> • 
                     Places : <strong class="text-shinobi-gold">{{ $currentCount }} / {{ $max }}</strong>
                 </p>
             </div>
 
-            <!-- CARTE D'INVITATION AVEC LE CODE DE SALON -->
-            <div class="rounded-2xl border-2 border-shinobi-gold/60 bg-black/60 p-5 space-y-3 font-mono text-xs max-w-sm shadow-2xl shrink-0">
+            <!-- CARTE D'INVITATION & PARTAGE MULTI-CANAL -->
+            <div class="rounded-2xl border-2 border-shinobi-gold/60 bg-black/70 p-5 space-y-3.5 font-mono text-xs max-w-md w-full shadow-2xl shrink-0">
                 <div class="flex items-center justify-between">
-                    <span class="text-slate-400 font-bold uppercase text-[10px]">Code d'invitation secret</span>
-                    <span x-show="copied" class="text-emerald-400 font-bold text-[10px] flex items-center gap-1">
-                        <i class="bi bi-check2"></i> Copié !
+                    <span class="text-slate-300 font-bold uppercase text-[10px] flex items-center gap-1.5">
+                        <i class="bi bi-shield-lock-fill text-shinobi-gold"></i>
+                        Code secret du salon
+                    </span>
+                    <span x-show="copiedType" 
+                          x-transition
+                          class="text-emerald-400 font-bold text-[10px] flex items-center gap-1">
+                        <i class="bi bi-check2-circle"></i>
+                        <span x-text="copiedType === 'code' ? 'Code copié !' : (copiedType === 'link' ? 'Lien copié !' : 'Invitation copiée !')"></span>
                     </span>
                 </div>
 
+                <!-- Code display + copy -->
                 <div class="flex items-center gap-2">
                     <div class="flex-1 bg-shinobi-dark border border-shinobi-border rounded-xl px-4 py-2 text-center text-xl font-black font-mono tracking-widest text-shinobi-gold select-all shadow-inner">
                         {{ $tournament->room_code }}
                     </div>
-                    <button type="button" @click="copyCode('{{ $tournament->room_code }}')" 
-                            class="px-3 py-2.5 rounded-xl border border-shinobi-border bg-white/5 hover:bg-white/10 text-white font-bold transition flex items-center gap-1"
-                            title="Copier le code">
+                    <button type="button" @click="copyText(shareCode, 'code')" 
+                            class="px-3.5 py-2.5 rounded-xl border border-shinobi-border bg-white/5 hover:bg-white/10 text-white font-bold transition flex items-center gap-1"
+                            title="Copier uniquement le code">
                         <i class="bi bi-clipboard text-base"></i>
                     </button>
                 </div>
 
-                <button type="button" @click="copyLink('{{ route('tournaments.private.join', ['code' => $tournament->room_code]) }}')"
-                        class="w-full py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-shinobi-border text-slate-300 hover:text-white font-mono text-[11px] font-bold transition flex items-center justify-center gap-1.5">
-                    <i class="bi bi-link-45deg text-base"></i>
-                    <span>Copier le lien direct pour tes amis</span>
-                </button>
+                <!-- Boutons de partage vers les amis -->
+                <div class="space-y-2 pt-1">
+                    <!-- WhatsApp Share (Message complet + lien) -->
+                    <button type="button" @click="shareWhatsApp()"
+                            class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold text-[11px] shadow-lg shadow-emerald-600/20 transition flex items-center justify-center gap-2">
+                        <i class="bi bi-whatsapp text-sm"></i>
+                        <span>Défier mes amis sur WhatsApp</span>
+                    </button>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <!-- Native Share API (Mobile / Desktop) -->
+                        <button type="button" @click="shareNative()"
+                                class="py-2 px-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-shinobi-border text-slate-200 hover:text-white font-mono text-[10px] font-bold transition flex items-center justify-center gap-1.5">
+                            <i class="bi bi-share-fill text-xs text-shinobi-gold"></i>
+                            <span>Partager l'invit</span>
+                        </button>
+
+                        <!-- Copier message d'invitation complet -->
+                        <button type="button" @click="copyText(shareMessage, 'all')"
+                                class="py-2 px-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-shinobi-border text-slate-200 hover:text-white font-mono text-[10px] font-bold transition flex items-center justify-center gap-1.5"
+                                title="Copier le texte du défi + lien">
+                            <i class="bi bi-chat-quote-fill text-xs text-shinobi-red"></i>
+                            <span>Copier le texte</span>
+                        </button>
+                    </div>
+
+                    <!-- Copier lien direct -->
+                    <button type="button" @click="copyText(shareUrl, 'link')"
+                            class="w-full py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-shinobi-border/60 text-slate-400 hover:text-white font-mono text-[10px] transition flex items-center justify-center gap-1.5">
+                        <i class="bi bi-link-45deg text-sm"></i>
+                        <span>Copier juste le lien direct</span>
+                    </button>
+                </div>
             </div>
 
         </div>

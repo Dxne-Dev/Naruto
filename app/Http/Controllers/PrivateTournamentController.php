@@ -36,7 +36,7 @@ class PrivateTournamentController extends Controller
                 }
             })
             ->withCount('entries')
-            ->with(['creator', 'entries.fighter'])
+            ->with(['creator.fighter', 'entries.fighter'])
             ->latest()
             ->paginate(10);
 
@@ -101,29 +101,64 @@ class PrivateTournamentController extends Controller
 
     /**
      * Join a private room via code or direct link.
+     * Accessible by guests (public invitation view with OpenGraph) and authenticated users.
      */
-    public function join(Request $request): RedirectResponse
+    public function join(Request $request): View|RedirectResponse
     {
-        $user = $request->user();
-        $fighter = $user?->fighter;
-
-        if (! $fighter) {
-            return redirect()->route('fighters.create')
-                ->with('error', 'Tu dois forger un combattant shinobi avant de rejoindre un tournoi.');
-        }
-
         $code = trim(strtoupper($request->input('room_code') ?? $request->query('code', '')));
 
         if (empty($code)) {
-            return back()->with('error', 'Veuillez saisir un code de salon valide.');
+            if (auth()->check()) {
+                return redirect()->route('tournaments.private.index')
+                    ->with('error', 'Veuillez saisir un code de salon valide.');
+            }
+
+            return redirect()->route('dashboard');
         }
 
         $tournament = Tournament::where('is_private', true)
             ->where('room_code', $code)
+            ->with(['creator.fighter', 'entries.fighter.user'])
             ->first();
 
         if (! $tournament) {
-            return back()->with('error', "Aucun salon privé trouvé avec le code [{$code}].");
+            if (auth()->check()) {
+                return redirect()->route('tournaments.private.index')
+                    ->with('error', "Aucun salon privé trouvé avec le code [{$code}].");
+            }
+
+            return redirect()->route('dashboard')
+                ->with('error', 'Ce salon privé est introuvable ou a été supprimé.');
+        }
+
+        $creatorFighter = $tournament->creator?->fighter;
+        $creatorShinobiName = $creatorFighter?->name ?? $tournament->creator?->name ?? 'Un Shinobi';
+        $challengeTitle = "{$creatorShinobiName} vous défie pour le tournoi d'examen chunin !";
+        $ogImage = $creatorFighter?->display_avatar_url ?? asset('images/naruto_hero_art.png');
+        $shareUrl = route('tournaments.private.join', ['code' => $tournament->room_code]);
+
+        // If user is a guest (or crawler/bot preview), display the public invitation card with OpenGraph metadata
+        if (! auth()->check()) {
+            $request->session()->put('pending_tournament_code', $tournament->room_code);
+
+            return view('tournaments.private.invite', [
+                'tournament' => $tournament,
+                'creatorFighter' => $creatorFighter,
+                'creatorShinobiName' => $creatorShinobiName,
+                'challengeTitle' => $challengeTitle,
+                'ogImage' => $ogImage,
+                'shareUrl' => $shareUrl,
+            ]);
+        }
+
+        $user = $request->user();
+        $fighter = $user?->fighter;
+
+        if (! $fighter) {
+            $request->session()->put('pending_tournament_code', $tournament->room_code);
+
+            return redirect()->route('fighters.create')
+                ->with('info', "Tu as été défié par {$creatorShinobiName} pour le tournoi d'examen chunin ! Forge ton combattant shinobi pour entrer dans l'arène.");
         }
 
         if ($tournament->entries()->where('fighter_id', $fighter->id)->exists()) {
@@ -131,7 +166,8 @@ class PrivateTournamentController extends Controller
         }
 
         if ($tournament->status !== Tournament::STATUS_REGISTRATION) {
-            return back()->with('error', 'Les inscriptions à ce salon sont déjà fermées.');
+            return redirect()->route('tournaments.private.lobby', $tournament)
+                ->with('error', 'Les inscriptions à ce salon sont déjà fermées.');
         }
 
         if (! $user->canAccessPrivateTournament()) {
@@ -140,7 +176,8 @@ class PrivateTournamentController extends Controller
         }
 
         if ($tournament->entries()->count() >= $tournament->max_participants) {
-            return back()->with('error', "Ce salon est complet ({$tournament->max_participants}/{$tournament->max_participants} combattants).");
+            return redirect()->route('tournaments.private.lobby', $tournament)
+                ->with('error', "Ce salon est complet ({$tournament->max_participants}/{$tournament->max_participants} combattants).");
         }
 
         try {
@@ -152,11 +189,21 @@ class PrivateTournamentController extends Controller
                 $request->userAgent()
             );
         } catch (\Throwable $e) {
-            return back()->with('error', $e->getMessage());
+            return redirect()->route('tournaments.private.index')->with('error', $e->getMessage());
         }
 
         return redirect()->route('tournaments.private.lobby', $tournament)
-            ->with('success', "Tu as rejoint le salon privé [{$tournament->title}] !");
+            ->with('success', "Tu as rejoint le salon privé [{$tournament->title}] pour relever le défi de {$creatorShinobiName} !");
+    }
+
+    /**
+     * Direct invitation URL alias by code.
+     */
+    public function invitation(Request $request, string $code): View|RedirectResponse
+    {
+        $request->merge(['code' => $code]);
+
+        return $this->join($request);
     }
 
     /**
@@ -169,7 +216,7 @@ class PrivateTournamentController extends Controller
         }
 
         $tournament->load([
-            'creator',
+            'creator.fighter',
             'entries.fighter.user',
             'matches.fighterA',
             'matches.fighterB',
@@ -181,12 +228,23 @@ class PrivateTournamentController extends Controller
         $isFull = $currentCount >= $max;
         $isCreator = auth()->id() === $tournament->creator_id;
 
+        $creatorFighter = $tournament->creator?->fighter;
+        $creatorShinobiName = $creatorFighter?->name ?? $tournament->creator?->name ?? 'Un Shinobi';
+        $challengeTitle = "{$creatorShinobiName} vous défie pour le tournoi d'examen chunin !";
+        $ogImage = $creatorFighter?->display_avatar_url ?? asset('images/naruto_hero_art.png');
+        $shareUrl = route('tournaments.private.join', ['code' => $tournament->room_code]);
+
         return view('tournaments.private.lobby', [
             'tournament' => $tournament,
             'max' => $max,
             'currentCount' => $currentCount,
             'isFull' => $isFull,
             'isCreator' => $isCreator,
+            'creatorFighter' => $creatorFighter,
+            'creatorShinobiName' => $creatorShinobiName,
+            'challengeTitle' => $challengeTitle,
+            'ogImage' => $ogImage,
+            'shareUrl' => $shareUrl,
         ]);
     }
 

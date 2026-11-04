@@ -289,4 +289,96 @@ class TournamentTest extends TestCase
         $this->assertNotNull($battle->winner_id);
         $this->assertGreaterThan(0, $battle->logs()->count());
     }
+
+    public function test_private_tournament_creation_and_opengraph_preview(): void
+    {
+        $user = User::factory()->create();
+        $fighter = Fighter::factory()->create([
+            'user_id' => $user->id,
+            'name' => 'Kakashi Hatake',
+            'clan' => 'Hatake',
+            'primary_element' => 'Raiton',
+        ]);
+
+        $response = $this->actingAs($user)->post(route('tournaments.private.store'), [
+            'title' => 'Duel des Génies',
+            'max_participants' => 4,
+        ]);
+
+        $tournament = Tournament::where('title', 'Duel des Génies')->first();
+        $this->assertNotNull($tournament);
+        $this->assertEquals($user->id, $tournament->creator_id);
+        $this->assertTrue($tournament->is_private);
+
+        $response->assertRedirect(route('tournaments.private.lobby', $tournament));
+
+        // Visit the lobby as the creator
+        $lobbyResponse = $this->actingAs($user)->get(route('tournaments.private.lobby', $tournament));
+        $lobbyResponse->assertStatus(200);
+
+        // OpenGraph meta verification
+        $lobbyResponse->assertSee('property="og:title"', false);
+        $lobbyResponse->assertSee('Kakashi Hatake vous défie pour le tournoi d&#039;examen chunin !', false);
+        $lobbyResponse->assertSee('name="twitter:title"', false);
+        $lobbyResponse->assertSee($tournament->room_code);
+        $lobbyResponse->assertSee('Défier mes amis sur WhatsApp');
+    }
+
+    public function test_guest_and_crawler_opengraph_preview_on_invite_link(): void
+    {
+        $creator = User::factory()->create();
+        $fighter = Fighter::factory()->create([
+            'user_id' => $creator->id,
+            'name' => 'Itachi Uchiha',
+            'clan' => 'Uchiha',
+        ]);
+
+        $tournament = Tournament::create([
+            'title' => 'Examen Chūnin Secret',
+            'is_private' => true,
+            'room_code' => 'UCHIHA-999',
+            'creator_id' => $creator->id,
+            'max_participants' => 8,
+            'status' => Tournament::STATUS_REGISTRATION,
+            'registration_opens_at' => now(),
+        ]);
+
+        // Unauthenticated request (guest / social preview crawler)
+        $response = $this->get(route('tournaments.private.join', ['code' => 'UCHIHA-999']));
+
+        $response->assertStatus(200);
+        $response->assertSee('property="og:title"', false);
+        $response->assertSee('Itachi Uchiha vous défie pour le tournoi d&#039;examen chunin !', false);
+        $response->assertSee('property="og:description"', false);
+        $response->assertSee('Itachi Uchiha vous défie pour le tournoi d&#039;examen chunin !', false);
+        $response->assertSee('UCHIHA-999');
+        $response->assertSessionHas('pending_tournament_code', 'UCHIHA-999');
+    }
+
+    public function test_authenticated_user_joins_tournament_via_invite_link(): void
+    {
+        $creator = User::factory()->create();
+        $creatorFighter = Fighter::factory()->create(['user_id' => $creator->id, 'name' => 'Minato']);
+
+        $tournament = Tournament::create([
+            'title' => 'Tournoi de l\'Éclair',
+            'is_private' => true,
+            'room_code' => 'FLASH-123',
+            'creator_id' => $creator->id,
+            'max_participants' => 4,
+            'status' => Tournament::STATUS_REGISTRATION,
+            'registration_opens_at' => now(),
+        ]);
+
+        app(TournamentService::class)->registerFighter($tournament, $creatorFighter);
+
+        // Second user with fighter clicks invite link
+        $friend = User::factory()->create();
+        $friendFighter = Fighter::factory()->create(['user_id' => $friend->id, 'name' => 'Kushina']);
+
+        $response = $this->actingAs($friend)->get(route('tournaments.private.join', ['code' => 'FLASH-123']));
+
+        $response->assertRedirect(route('tournaments.private.lobby', $tournament));
+        $this->assertEquals(2, $tournament->entries()->count());
+    }
 }

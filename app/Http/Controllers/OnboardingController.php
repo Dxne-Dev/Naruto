@@ -174,6 +174,11 @@ class OnboardingController extends Controller
 
         // Si l'utilisateur a déjà payé ou ne souhaite pas payer :
         if ($alreadyPaid) {
+            if ($pendingCode = $request->session()->pull('pending_tournament_code')) {
+                return redirect()->route('tournaments.private.join', ['code' => $pendingCode])
+                    ->with('success', 'Ton nouveau Shinobi a été forgé ! Tu rejoins directement le salon privé.');
+            }
+
             return redirect()->route('fighters.my-character')
                 ->with('success', 'Ton nouveau Shinobi a été forgé ! Ton Pass Illimité est actif et ton portrait est en cours de création par l\'administration.');
         }
@@ -182,6 +187,11 @@ class OnboardingController extends Controller
         if ($wantsToPay) {
             return redirect()->route('payment.checkout', ['from_onboarding' => 1])
                 ->with('info', 'Ton Shinobi est forgé ! Finalise maintenant ton Pass Naruto pour débloquer les tournois illimités et ton portrait officiel.');
+        }
+
+        if ($pendingCode = $request->session()->pull('pending_tournament_code')) {
+            return redirect()->route('tournaments.private.join', ['code' => $pendingCode])
+                ->with('success', 'Ton Shinobi a été éveillé avec succès ! Tu rejoins maintenant le salon privé.');
         }
 
         return redirect()->route('fighters.my-character')

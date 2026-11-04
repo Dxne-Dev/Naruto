@@ -45,6 +45,11 @@ class AuthController extends Controller
                     ->with('success', 'Bienvenue dans le Poste de Commandement, Grand Maître.');
             }
 
+            if ($pendingCode = $request->session()->pull('pending_tournament_code')) {
+                return redirect()->route('tournaments.private.join', ['code' => $pendingCode])
+                    ->with('success', 'Ravi de te revoir ! Tu rejoins le salon privé.');
+            }
+
             return redirect()->intended(route('dashboard'))
                 ->with('success', 'Ravi de te revoir dans l\'arène !');
         }

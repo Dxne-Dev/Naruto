@@ -6,6 +6,22 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Otaku Arena — L\'Arène Shinobi des Tournois de l\'Examen Chūnin' }}</title>
 
+    <!-- OpenGraph & Social Sharing Meta Tags -->
+    @if(View::hasSection('og_meta'))
+        @yield('og_meta')
+    @else
+        <meta property="og:site_name" content="Otaku Arena">
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="{{ $title ?? 'Otaku Arena — L\'Arène Shinobi des Tournois de l\'Examen Chūnin' }}">
+        <meta property="og:description" content="Affronte les meilleurs ninjas dans l'arène de l'Examen Chūnin. Combats au tour par tour, stratégie ninja et gloire éternelle !">
+        <meta property="og:image" content="{{ asset('images/naruto_hero_art.png') }}">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ $title ?? 'Otaku Arena — L\'Arène Shinobi des Tournois de l\'Examen Chūnin' }}">
+        <meta name="twitter:description" content="Affronte les meilleurs ninjas dans l'arène de l'Examen Chūnin. Combats au tour par tour, stratégie ninja et gloire éternelle !">
+        <meta name="twitter:image" content="{{ asset('images/naruto_hero_art.png') }}">
+    @endif
+
     <!-- Favicon Officiel Otaku Arena -->
     <link rel="icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}">

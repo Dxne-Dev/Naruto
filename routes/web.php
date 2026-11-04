@@ -27,6 +27,14 @@ use Illuminate\Support\Facades\Storage;
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
 
+// Salons Privés : Accès invitation publique & prévisualisation OpenGraph
+Route::match(['GET', 'POST'], '/salons-prives/rejoindre', [PrivateTournamentController::class, 'join'])
+    ->middleware('throttle:30,1')
+    ->name('tournaments.private.join');
+Route::get('/salons-prives/invitation/{code}', [PrivateTournamentController::class, 'invitation'])
+    ->middleware('throttle:30,1')
+    ->name('tournaments.private.invite');
+
 // Public Webhook for Chariow Pulse & Aggregators (CSRF exempt, No auth required)
 Route::match(['GET', 'POST'], '/checkout/webhook', [PaymentController::class, 'webhook'])->name('payment.webhook');
 
@@ -114,7 +122,6 @@ Route::middleware('auth')->group(function () {
     // Private Tournament Rooms (Salons privés entre amis avec protection brute-force)
     Route::get('/salons-prives', [PrivateTournamentController::class, 'index'])->name('tournaments.private.index');
     Route::post('/salons-prives', [PrivateTournamentController::class, 'store'])->middleware('throttle:10,1')->name('tournaments.private.store');
-    Route::match(['GET', 'POST'], '/salons-prives/rejoindre', [PrivateTournamentController::class, 'join'])->middleware('throttle:15,1')->name('tournaments.private.join');
     Route::get('/salons-prives/{tournament}', [PrivateTournamentController::class, 'lobby'])->name('tournaments.private.lobby');
     Route::post('/salons-prives/{tournament}/lancer', [PrivateTournamentController::class, 'start'])->middleware('throttle:10,1')->name('tournaments.private.start');
 
