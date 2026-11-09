@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
     'email',
     'password',
     'role',
+    'is_bot',
     'wheel_tokens',
     'has_paid_microtransaction',
     'registration_ip',
@@ -34,10 +35,46 @@ class User extends Authenticatable
 
     public const ROLE_ADMIN = 'admin';
 
+    public const ROLE_BOT = 'bot';
+
     /**
      * Backward compatibility alias.
      */
     public const ROLE_GAME_MASTER = self::ROLE_ADMIN;
+
+    /**
+     * Determine if this user account is an injected AI bot.
+     */
+    public function isBot(): bool
+    {
+        return (bool) ($this->is_bot || $this->role === self::ROLE_BOT || str_ends_with($this->email, '@arena.local') || str_starts_with($this->username, 'Bot_'));
+    }
+
+    /**
+     * Scope for real human players only (excluding bots).
+     */
+    public function scopeRealPlayers($query)
+    {
+        return $query->where('role', self::ROLE_PLAYER)
+            ->where(function ($q) {
+                $q->where('is_bot', false)->orWhereNull('is_bot');
+            })
+            ->where('email', 'not like', '%@arena.local')
+            ->where('username', 'not like', 'Bot_%');
+    }
+
+    /**
+     * Scope for injected bots only.
+     */
+    public function scopeBots($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('is_bot', true)
+                ->orWhere('role', self::ROLE_BOT)
+                ->orWhere('email', 'like', '%@arena.local')
+                ->orWhere('username', 'like', 'Bot_%');
+        });
+    }
 
     /**
      * Check if the user is currently online based on active session (last 5 minutes).
@@ -236,6 +273,7 @@ class User extends Authenticatable
             'wheel_tokens' => 'integer',
             'has_paid_microtransaction' => 'boolean',
             'is_suspended' => 'boolean',
+            'is_bot' => 'boolean',
         ];
     }
 }

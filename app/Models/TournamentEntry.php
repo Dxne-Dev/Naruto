@@ -51,4 +51,24 @@ class TournamentEntry extends Model
     {
         return $this->belongsTo(Fighter::class);
     }
+
+    /**
+     * Check if this tournament entry is an AI bot.
+     */
+    public function isBot(): bool
+    {
+        if ($this->fighter) {
+            return (bool) ($this->fighter->is_bot || $this->fighter->user?->isBot());
+        }
+
+        return false;
+    }
+
+    /**
+     * Dynamic is_bot attribute for collection filtering: $entries->where('is_bot', false).
+     */
+    public function getIsBotAttribute(): bool
+    {
+        return $this->isBot();
+    }
 }

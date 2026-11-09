@@ -111,7 +111,11 @@
         <div class="card h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="card-title mb-0">Combattants Inscrits ({{ $tournament->entries->count() }}/8)</h4>
-                <span class="badge bg-info">{{ $tournament->entries->where('is_bot', false)->count() }} Humains / {{ $tournament->entries->where('is_bot', true)->count() }} Bots</span>
+                @php
+                    $botEntriesCount = $tournament->entries->filter(fn($e) => $e->is_bot)->count();
+                    $humanEntriesCount = $tournament->entries->count() - $botEntriesCount;
+                @endphp
+                <span class="badge bg-info">{{ $humanEntriesCount }} Humains / {{ $botEntriesCount }} Bots</span>
             </div>
             <div class="card-body">
                 <div class="list-group list-group-flush">

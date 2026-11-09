@@ -5,23 +5,73 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class UserAdminController extends Controller
 {
     /**
-     * List all players and their characters.
+     * List all players and their characters with real players/bots filtering and search.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $users = User::with('fighter')
-            ->where('role', User::ROLE_PLAYER)
-            ->latest()
-            ->paginate(15);
+        $type = $request->query('type', 'real'); // 'real' (default), 'bots', 'all'
+        $search = trim((string) $request->query('q', ''));
+
+        // Badge counts for tabs
+        $realCount = User::realPlayers()->count();
+        $botsCount = User::bots()->count();
+        $totalCount = User::where('role', User::ROLE_PLAYER)->count();
+
+        // Scope based on selected tab
+        $query = match ($type) {
+            'bots' => User::with('fighter')->bots(),
+            'all' => User::with('fighter')->where('role', User::ROLE_PLAYER),
+            default => User::with('fighter')->realPlayers(),
+        };
+
+        // Keyword search across username, name, email and shinobi fighter name/clan
+        if ($search !== '') {
+            $query->where(function ($sub) use ($search) {
+                $sub->where('username', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhereHas('fighter', function ($fq) use ($search) {
+                        $fq->where('name', 'like', "%{$search}%")
+                            ->orWhere('clan', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $users = $query->latest()->paginate(15)->withQueryString();
 
         return view('admin.users.index', [
             'users' => $users,
+            'type' => $type,
+            'search' => $search,
+            'realCount' => $realCount,
+            'botsCount' => $botsCount,
+            'totalCount' => $totalCount,
         ]);
+    }
+
+    /**
+     * Purge all injected bot accounts and their fighters.
+     */
+    public function purgeBots(): RedirectResponse
+    {
+        $bots = User::bots()->with('fighter')->get();
+        $count = $bots->count();
+
+        foreach ($bots as $bot) {
+            if ($bot->fighter) {
+                $bot->fighter->delete();
+            }
+            $bot->delete();
+        }
+
+        return redirect()->route('admin.users.index', ['type' => 'real'])
+            ->with('success', "{$count} bot(s) injecté(s) ont été purgés avec succès.");
     }
 
     /**

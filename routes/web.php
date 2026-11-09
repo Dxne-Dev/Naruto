@@ -160,6 +160,7 @@ Route::middleware('auth')->group(function () {
 
         // User and Character Management (/admin/user)
         Route::get('/user', [UserAdminController::class, 'index'])->name('users.index');
+        Route::delete('/user/purge-bots', [UserAdminController::class, 'purgeBots'])->name('users.purge-bots');
         Route::post('/user/{user}/toggle-suspension', [UserAdminController::class, 'toggleSuspension'])->name('users.toggle-suspension');
         Route::delete('/user/{user}', [UserAdminController::class, 'destroy'])->name('users.destroy');
         Route::delete('/user/{user}/fighter', [UserAdminController::class, 'deleteFighter'])->name('users.delete-fighter');

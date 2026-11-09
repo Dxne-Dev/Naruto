@@ -74,7 +74,16 @@ class Fighter extends Model
             'level' => 'integer',
             'xp' => 'integer',
             'portrait_ordered_at' => 'datetime',
+            'is_bot' => 'boolean',
         ];
+    }
+
+    /**
+     * Check if this fighter is an AI bot.
+     */
+    public function isBot(): bool
+    {
+        return (bool) ($this->is_bot || $this->user?->isBot());
     }
 
     /**

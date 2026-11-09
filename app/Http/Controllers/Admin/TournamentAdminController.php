@@ -196,6 +196,7 @@ class TournamentAdminController extends Controller
                 'email' => $botUsername.'@arena.local',
                 'password' => Hash::make('secret123'),
                 'role' => User::ROLE_PLAYER,
+                'is_bot' => true,
             ]);
 
             $candidate = $this->fighterGenerator->generateCandidate();
@@ -226,6 +227,7 @@ class TournamentAdminController extends Controller
                 'portrait_path' => $candidate['portrait'],
                 'level' => 1,
                 'xp' => 0,
+                'is_bot' => true,
             ]);
 
             if (! empty($candidate['jutsu_ids'])) {

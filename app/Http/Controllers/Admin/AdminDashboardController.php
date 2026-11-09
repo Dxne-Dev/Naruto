@@ -30,7 +30,7 @@ class AdminDashboardController extends Controller
             $query->where('is_bot', true);
         })->count();
 
-        $totalUsersCount = User::where('role', User::ROLE_PLAYER)->count();
+        $totalUsersCount = User::realPlayers()->count();
         $totalFightersCount = Fighter::where('is_bot', false)->count();
 
         $recentTournaments = Tournament::withCount('entries')
