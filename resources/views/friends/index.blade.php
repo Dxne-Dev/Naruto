@@ -101,26 +101,6 @@
     @endif
 
     <!-- ========================================================================= -->
-    <!-- RÈGLES DES DUELS AMICAUX (5 XP PAR VICTOIRE, MAX 15 XP/JOUR, 48H PAR AMI)   -->
-    <!-- ========================================================================= -->
-    <div class="rounded-2xl border border-shinobi-gold/30 bg-gradient-to-r from-amber-950/20 via-shinobi-card to-shinobi-dark p-3.5 sm:p-4 flex items-center justify-between gap-3 font-mono text-xs shadow-md">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-shinobi-gold/15 border border-shinobi-gold/30 flex items-center justify-center text-shinobi-gold shrink-0">
-                <i class="bi bi-award-fill"></i>
-            </div>
-            <div>
-                <span class="text-white font-bold block text-[11px] sm:text-xs">Duels entre Rivaux : +5 XP par victoire</span>
-                <span class="text-slate-400 text-[10px] sm:text-[11px]">Plafond journalier de 15 XP max • Cooldown de 48h par ami vaincu.</span>
-            </div>
-        </div>
-        <div class="shrink-0 hidden sm:block">
-            <span class="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-shinobi-gold text-[10px] font-bold">
-                Max 3 victoires rémunérées / jour
-            </span>
-        </div>
-    </div>
-
-    <!-- ========================================================================= -->
     <!-- 2. ONGLETS SECONDAIRES DYNAMIQUES AVEC COMPTEURS COMPLETS                  -->
     <!-- ========================================================================= -->
     <div class="flex items-center gap-2 border-b border-shinobi-border/60 pb-3 font-mono text-xs overflow-x-auto">
