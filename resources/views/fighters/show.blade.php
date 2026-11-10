@@ -504,6 +504,7 @@
                         @php
                             $isWinner = $b->winner_id === $fighter->id;
                             $opponent = $b->fighter_a_id === $fighter->id ? $b->fighterB : $b->fighterA;
+                            $xpTx = $b->xpTransactionFor($fighter->id);
                         @endphp
                         <div class="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-shinobi-border/50 font-mono text-xs">
                             <div class="flex items-center gap-2 min-w-0">
@@ -520,9 +521,19 @@
                                     <span class="text-[9px] text-slate-500 block">{{ $b->created_at->diffForHumans() }}</span>
                                 </div>
                             </div>
-                            <span class="text-[10px] font-bold {{ $isWinner ? 'text-shinobi-gold' : 'text-slate-500' }}">
-                                {{ $isWinner ? '+100 XP' : '-50 XP' }}
-                            </span>
+                            @if($xpTx)
+                                <span class="text-[10px] font-bold text-shinobi-gold">
+                                    +{{ $xpTx->amount }} XP
+                                </span>
+                            @elseif($b->match_id && $isWinner)
+                                <span class="text-[10px] font-bold text-shinobi-gold">+150 XP</span>
+                            @elseif($b->match_id && ! $isWinner && $b->match?->round === 1)
+                                <span class="text-[10px] font-bold text-amber-400/90">+50 XP</span>
+                            @else
+                                <span class="text-[10px] font-mono text-slate-500">
+                                    {{ $b->match_id ? '0 XP' : 'Amical' }}
+                                </span>
+                            @endif
                         </div>
                     @empty
                         <div class="py-6 text-center text-slate-400 font-mono text-xs space-y-2">

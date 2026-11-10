@@ -99,4 +99,33 @@ class Battle extends Model
         // If either fighter is not a bot, it involves a human player
         return (! $isBotA) || (! $isBotB);
     }
+
+    /**
+     * Associated challenge if this battle was a friend duel.
+     */
+    public function challenge(): BelongsTo
+    {
+        return $this->belongsTo(Challenge::class, 'id', 'battle_id');
+    }
+
+    /**
+     * Get XP transaction earned by a given fighter in this battle (if any).
+     */
+    public function xpTransactionFor(int $fighterId): ?XpTransaction
+    {
+        return XpTransaction::where('fighter_id', $fighterId)
+            ->where(function ($q) {
+                $q->where(function ($sq) {
+                    $sq->where('reference_type', 'friend_duel')
+                        ->where('reference_id', $this->id);
+                });
+                if ($this->match_id) {
+                    $q->orWhere(function ($mq) {
+                        $mq->whereIn('reference_type', ['match_win', 'match_loss_round_1'])
+                            ->where('reference_id', $this->match_id);
+                    });
+                }
+            })
+            ->first();
+    }
 }

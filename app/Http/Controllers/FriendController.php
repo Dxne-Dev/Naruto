@@ -8,6 +8,7 @@ use App\Models\Friendship;
 use App\Models\MatchGame;
 use App\Models\User;
 use App\Services\BattleEngine;
+use App\Services\XpService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,8 @@ use Illuminate\View\View;
 class FriendController extends Controller
 {
     public function __construct(
-        protected BattleEngine $battleEngine
+        protected BattleEngine $battleEngine,
+        protected XpService $xpService
     ) {}
 
     /**
@@ -337,8 +339,19 @@ class FriendController extends Controller
             'responded_at' => now(),
         ]);
 
+        $winnerFighter = $battle->winner_id === $fighterA->id ? $fighterA : $fighterB;
+        $opponentFighter = $battle->winner_id === $fighterA->id ? $fighterB : $fighterA;
+
+        // Process XP for the winner (5 XP, 15 XP daily cap, 48h cooldown against this friend)
+        $xpResult = $this->xpService->awardFriendDuelWinXp($winnerFighter, $opponentFighter, $battle);
+
+        $isUserWinner = $battle->winner_id === $user->fighter?->id;
+        $statusMsg = $isUserWinner ? 'Victoire !' : 'Défaite.';
+        $flashType = ($isUserWinner && $xpResult['awarded']) ? 'success' : 'info';
+        $message = "⚔️ Défi terminé ({$statusMsg}) {$xpResult['reason']}";
+
         return redirect()->route('battles.show', $battle)
-            ->with('success', "⚔️ Défi accepté ! Le duel contre {$challenge->sender->username} a eu lieu !");
+            ->with($flashType, $message);
     }
 
     /**
